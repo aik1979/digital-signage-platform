@@ -92,7 +92,6 @@
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
                     <img src="assets/images/logo.svg" alt="DSP Logo" class="h-10 w-auto">
-                    <span class="ml-3 text-xl font-bold gradient-text hidden sm:inline">Digital Signage Platform</span>
                 </div>
                 <div class="flex items-center space-x-4">
                     <a href="?page=login" class="text-gray-300 hover:text-white px-4 py-2 rounded-md text-sm font-medium transition">Login</a>
