@@ -1,0 +1,37 @@
+# Configuration files with sensitive data
+web/config/config.php
+
+# User uploaded content
+web/uploads/content/*
+web/uploads/thumbnails/*
+!web/uploads/content/.gitkeep
+!web/uploads/thumbnails/.gitkeep
+
+# Session files
+web/sessions/*
+!web/sessions/.gitkeep
+
+# Logs
+*.log
+web/logs/*
+!web/logs/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db
+.directory
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.bak
+*.cache
+
+# Pi client config (contains device keys)
+pi-client/config.json
