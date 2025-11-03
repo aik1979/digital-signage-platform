@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     setFlashMessage('success', 'Schedule created successfully!');
                     redirect('schedules');
                 } catch (Exception $e) {
-                    setFlashMessage('error', 'Failed to create schedule.');
+                    setFlashMessage('error', 'Database error: ' . $e->getMessage());
                 }
             }
         }
