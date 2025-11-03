@@ -186,6 +186,9 @@ if (isset($_GET['edit'])) {
         </div>
         
         <div class="screen-actions">
+            <a href="viewer.php?key=<?php echo urlencode($screen['device_key']); ?>" target="_blank" class="btn btn-primary btn-sm">
+                🖥️ Test Display
+            </a>
             <a href="?page=screens&view_key=<?php echo $screen['id']; ?>" class="btn btn-secondary btn-sm">
                 🔑 View Key
             </a>
