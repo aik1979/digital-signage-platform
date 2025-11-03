@@ -180,20 +180,22 @@ $itemsJson = json_encode($items);
         
         .branding {
             position: fixed;
-            top: 10px;
+            bottom: 10px;
             left: 10px;
-            background: rgba(0, 128, 128, 0.9);
-            color: #fff;
-            padding: 8px 12px;
-            border-radius: 5px;
-            font-size: 14px;
-            font-weight: bold;
             z-index: 1000;
+            opacity: 0.7;
+        }
+        
+        .branding img {
+            height: 40px;
+            width: auto;
         }
     </style>
 </head>
 <body>
-    <div class="branding">Digital Signage Platform</div>
+    <div class="branding">
+        <img src="assets/images/logo.png" alt="DSP">
+    </div>
     
     <div id="viewer" class="transition-<?php echo htmlspecialchars($transition); ?>">
         <div class="loading">Loading content...</div>
