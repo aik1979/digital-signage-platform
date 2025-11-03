@@ -34,7 +34,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
-                    <img src="assets/images/logo.jpg" alt="DSP Logo" class="h-10 w-auto">
+                    <img src="assets/images/logo.svg" alt="DSP Logo" class="h-10 w-auto">
                 </div>
                 <div class="flex items-center space-x-1">
                     <a href="?page=dashboard" class="px-4 py-2 rounded-md text-sm font-medium transition-colors <?php echo $page === 'dashboard' ? 'bg-dsp-blue text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?>">Dashboard</a>

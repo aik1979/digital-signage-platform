@@ -75,7 +75,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
-                    <img src="logo.png" alt="DSP Logo" class="h-10 w-auto">
+                    <img src="assets/images/logo.svg" alt="DSP Logo" class="h-10 w-auto">
                     <span class="ml-3 text-xl font-bold gradient-text">Digital Signage Platform</span>
                 </div>
                 <div class="flex items-center space-x-4">
