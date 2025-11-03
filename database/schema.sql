@@ -84,13 +84,16 @@ CREATE TABLE IF NOT EXISTS playlists (
     name VARCHAR(255) NOT NULL,
     description TEXT DEFAULT NULL,
     transition VARCHAR(20) DEFAULT 'fade' COMMENT 'Transition effect: fade, slide, zoom, none',
+    share_token VARCHAR(64) UNIQUE DEFAULT NULL COMMENT 'Unique token for public sharing',
+    share_enabled TINYINT(1) DEFAULT 0 COMMENT 'Enable public sharing',
     is_default TINYINT(1) DEFAULT 0,
     is_active TINYINT(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_user_id (user_id),
-    INDEX idx_is_default (is_default)
+    INDEX idx_is_default (is_default),
+    INDEX idx_share_token (share_token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Playlist items table

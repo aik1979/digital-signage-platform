@@ -3,6 +3,9 @@
 # Enable rewrite engine
 RewriteEngine On
 
+# Clean URL for public viewer: /view/TOKEN -> public_viewer.php?token=TOKEN
+RewriteRule ^view/([a-zA-Z0-9_-]+)$ public_viewer.php?token=$1 [L,QSA]
+
 # Force HTTPS (uncomment when SSL is enabled)
 # RewriteCond %{HTTPS} off
 # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

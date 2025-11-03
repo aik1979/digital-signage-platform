@@ -1,7 +1,7 @@
 <?php
 /**
  * Public Playlist Viewer - Shareable URL for browser-based display
- * Access via: public_viewer.php?id=PLAYLIST_ID&token=SHARE_TOKEN
+ * Access via: public_viewer.php?token=SHARE_TOKEN or view/SHARE_TOKEN
  */
 
 session_start();
@@ -11,21 +11,25 @@ require_once __DIR__ . '/includes/functions.php';
 
 $db = Database::getInstance();
 
-// Get playlist ID from URL
-$playlistId = isset($_GET['id']) ? intval($_GET['id']) : 0;
+// Get share token from URL
+$shareToken = isset($_GET['token']) ? trim($_GET['token']) : '';
 
-if (!$playlistId) {
-    die('Error: No playlist specified.');
+if (empty($shareToken)) {
+    die('Error: Invalid or missing share token.');
 }
 
-// Get playlist info
+// Get playlist info using share token
 $playlist = $db->fetchOne(
-    "SELECT id, name, transition, is_active FROM playlists WHERE id = ? AND is_active = 1",
-    [$playlistId]
+    "SELECT id, name, transition, is_active, share_enabled FROM playlists WHERE share_token = ? AND is_active = 1",
+    [$shareToken]
 );
 
 if (!$playlist) {
     die('Error: Playlist not found or inactive.');
+}
+
+if (!$playlist['share_enabled']) {
+    die('Error: Public sharing is disabled for this playlist.');
 }
 
 $transition = $playlist['transition'] ?? 'fade';

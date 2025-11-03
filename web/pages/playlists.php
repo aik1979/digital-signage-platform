@@ -20,11 +20,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $db->query("UPDATE playlists SET is_default = 0 WHERE user_id = ?", [$userId]);
                 }
                 
+                // Generate unique share token
+                $shareToken = 'pl_' . bin2hex(random_bytes(16));
+                
                 $playlistId = $db->insert('playlists', [
                     'user_id' => $userId,
                     'name' => $name,
                     'description' => $description,
                     'transition' => $transition,
+                    'share_token' => $shareToken,
+                    'share_enabled' => 0,
                     'is_default' => $isDefault,
                     'is_active' => 1
                 ]);
@@ -44,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $name = sanitize($_POST['name'] ?? '');
         $description = sanitize($_POST['description'] ?? '');
         $transition = sanitize($_POST['transition'] ?? 'fade');
+        $shareEnabled = isset($_POST['share_enabled']) ? 1 : 0;
         $isDefault = isset($_POST['is_default']) ? 1 : 0;
         
         $playlist = $db->fetchOne("SELECT id FROM playlists WHERE id = ? AND user_id = ?", [$playlistId, $userId]);
@@ -60,6 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     'name' => $name,
                     'description' => $description,
                     'transition' => $transition,
+                    'share_enabled' => $shareEnabled,
                     'is_default' => $isDefault
                 ], 'id = :id', ['id' => $playlistId]);
                 
@@ -218,9 +225,15 @@ if (isset($_GET['edit'])) {
             </div>
             
             <div class="playlist-actions">
-                <a href="public_viewer.php?id=<?php echo $playlist['id']; ?>" target="_blank" class="btn btn-secondary btn-sm" title="View in browser">
+                <?php if ($playlist['share_enabled'] && $playlist['share_token']): ?>
+                <a href="view/<?php echo $playlist['share_token']; ?>" target="_blank" class="btn btn-secondary btn-sm" title="View in browser">
                     🌐 View
                 </a>
+                <?php else: ?>
+                <button type="button" class="btn btn-secondary btn-sm" disabled title="Enable sharing in playlist settings">
+                    🌐 View
+                </button>
+                <?php endif; ?>
                 <a href="?page=playlists&edit=<?php echo $playlist['id']; ?>" class="btn btn-primary btn-sm">
                     ✏️ Edit
                 </a>
@@ -361,6 +374,24 @@ if (isset($_GET['edit'])) {
                     </select>
                     <small>Animation between content items</small>
                 </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="share_enabled" <?php echo ($editPlaylist['share_enabled'] ?? 0) ? 'checked' : ''; ?>>
+                        Enable public sharing (browser-based viewing)
+                    </label>
+                </div>
+                
+                <?php if ($editPlaylist['share_token']): ?>
+                <div class="form-group">
+                    <label>Share URL</label>
+                    <div class="key-box">
+                        <code id="shareUrl"><?php echo APP_URL; ?>view/<?php echo $editPlaylist['share_token']; ?></code>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="copyShareUrl()">📋 Copy</button>
+                    </div>
+                    <small>Share this URL to allow browser-based viewing</small>
+                </div>
+                <?php endif; ?>
                 
                 <div class="form-group">
                     <label>
@@ -619,6 +650,25 @@ function confirmDelete(playlistId, playlistName) {
         document.getElementById('deletePlaylistId').value = playlistId;
         document.getElementById('deleteForm').submit();
     }
+}
+
+// Copy share URL to clipboard
+function copyShareUrl() {
+    const shareUrl = document.getElementById('shareUrl');
+    const text = shareUrl.textContent;
+    
+    navigator.clipboard.writeText(text).then(() => {
+        alert('✅ Share URL copied to clipboard!');
+    }).catch(err => {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('✅ Share URL copied to clipboard!');
+    });
 }
 
 // Close modal when clicking outside
