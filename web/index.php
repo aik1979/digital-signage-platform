@@ -58,6 +58,12 @@ if ($isLoggedIn && $page === 'login') {
     exit;
 }
 
+// Load user data if logged in
+$user = [];
+if ($isLoggedIn) {
+    $user = $auth->getUser();
+}
+
 // Include header
 include __DIR__ . '/includes/header.php';
 
