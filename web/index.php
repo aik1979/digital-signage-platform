@@ -25,6 +25,15 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'home';
 $auth = new Auth($db);
 $isLoggedIn = $auth->isLoggedIn();
 
+// Handle AJAX requests before any HTML output
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    if ($_POST['action'] === 'save_playlist_items' && $page === 'playlists') {
+        // This is an AJAX request, process it without HTML
+        require_once __DIR__ . '/pages/playlists.php';
+        exit; // Stop execution after AJAX response
+    }
+}
+
 // Public pages (no login required)
 $publicPages = ['login', 'register', 'forgot-password', 'reset-password'];
 
