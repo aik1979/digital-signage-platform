@@ -34,6 +34,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
+// Handle GET AJAX requests
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action'])) {
+    if ($_GET['action'] === 'get_share_link' && $page === 'playlists') {
+        // This is an AJAX request, process it without HTML
+        require_once __DIR__ . '/pages/playlists.php';
+        exit; // Stop execution after AJAX response
+    }
+}
+
 // Public pages (no login required)
 $publicPages = ['login', 'register', 'forgot-password', 'reset-password'];
 
