@@ -26,7 +26,7 @@
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen">
     <?php if ($isLoggedIn): ?>
-    <nav class="bg-black border-b-4 rgb-stripe">
+    <nav class="bg-black border-b border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
