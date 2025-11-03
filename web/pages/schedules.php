@@ -15,8 +15,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $startDate = !empty($_POST['start_date']) ? sanitize($_POST['start_date']) : null;
         $endDate = !empty($_POST['end_date']) ? sanitize($_POST['end_date']) : null;
         
-        if (empty($name) || empty($startTime) || empty($endTime) || empty($daysOfWeek)) {
-            setFlashMessage('error', 'Name, times, and days are required.');
+        $errors = [];
+        if (empty($name)) $errors[] = 'Schedule name';
+        if (empty($screenId)) $errors[] = 'Screen';
+        if (empty($playlistId)) $errors[] = 'Playlist';
+        if (empty($startTime)) $errors[] = 'Start time';
+        if (empty($endTime)) $errors[] = 'End time';
+        if (empty($daysOfWeek)) $errors[] = 'Days of week';
+        
+        if (!empty($errors)) {
+            setFlashMessage('error', 'Missing required fields: ' . implode(', ', $errors));
         } else {
             // Verify screen ownership
             $screen = $db->fetchOne("SELECT id FROM screens WHERE id = ? AND user_id = ?", [$screenId, $userId]);
