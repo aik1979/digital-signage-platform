@@ -270,6 +270,41 @@ $accountAge = floor((time() - strtotime($user['created_at'])) / 86400);
         </div>
     </div>
 
+    <!-- Tour Preferences -->
+    <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-lg">
+        <h2 class="text-2xl font-bold text-white mb-4">🎯 Guided Tour Preferences</h2>
+        <p class="text-gray-400 mb-6">Control when and how the interactive guided tours appear.</p>
+        
+        <div class="space-y-4">
+            <div class="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
+                <div>
+                    <p class="font-bold text-white mb-1">Auto-start Tours</p>
+                    <p class="text-sm text-gray-400">Automatically show guided tours when visiting pages for the first time.</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="tourEnabled" class="sr-only peer" checked onchange="toggleTourPreference()">
+                    <div class="w-14 h-7 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-dsp-blue"></div>
+                </label>
+            </div>
+            
+            <div class="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
+                <div>
+                    <p class="font-bold text-white mb-1">Restart Tour</p>
+                    <p class="text-sm text-gray-400">Manually start the guided tour for the current page.</p>
+                </div>
+                <button onclick="startTour()" class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold py-2 px-6 rounded-lg hover:from-yellow-600 hover:to-yellow-700 transition shadow-lg">
+                    🎯 Start Tour
+                </button>
+            </div>
+            
+            <div class="bg-blue-900 bg-opacity-30 border border-blue-700 rounded-lg p-4">
+                <p class="text-blue-300 text-sm">
+                    <strong>💡 Tip:</strong> Tours are helpful for learning the platform. They automatically appear once per page per session. You can always restart them using the 🎯 Tour button in the navigation bar.
+                </p>
+            </div>
+        </div>
+    </div>
+
     <!-- Danger Zone -->
     <div class="bg-red-900 bg-opacity-20 border-2 border-red-700 rounded-lg p-6 shadow-lg">
         <h2 class="text-2xl font-bold text-red-400 mb-4">Danger Zone</h2>
@@ -296,4 +331,23 @@ function toggleSection(sectionId) {
         section.style.display = 'none';
     }
 }
+
+function toggleTourPreference() {
+    const checkbox = document.getElementById('tourEnabled');
+    if (checkbox.checked) {
+        enableTour();
+        alert('✅ Guided tours enabled! Tours will automatically appear when you visit pages.');
+    } else {
+        disableTour();
+        alert('❌ Guided tours disabled. You can still manually start tours using the 🎯 Tour button.');
+    }
+}
+
+// Initialize tour toggle state on page load
+window.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('tourEnabled');
+    if (checkbox) {
+        checkbox.checked = !isTourDisabled();
+    }
+});
 </script>

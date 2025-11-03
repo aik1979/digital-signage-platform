@@ -7,6 +7,9 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="shortcut icon" href="favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Intro.js for guided tours -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -41,6 +44,9 @@
                     <a href="?page=getting-started" class="px-4 py-2 rounded-md text-sm font-medium transition-colors <?php echo $page === 'getting-started' ? 'bg-green-600 text-white' : 'text-green-400 hover:bg-green-900 hover:text-green-300'; ?>">📖 Guide</a>
                 </div>
                 <div class="flex items-center space-x-4">
+                    <button onclick="startTour()" class="text-yellow-400 hover:text-yellow-300 text-sm transition-colors" title="Start Guided Tour">
+                        🎯 Tour
+                    </button>
                     <span class="text-gray-300 text-sm">Welcome, <?php echo sanitize($_SESSION['user_name']); ?></span>
                     <a href="?page=settings" class="text-gray-300 hover:text-white text-sm transition-colors">Settings</a>
                     <a href="?page=logout" class="text-gray-300 hover:text-white text-sm transition-colors">Logout</a>
