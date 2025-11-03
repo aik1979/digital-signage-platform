@@ -10,7 +10,7 @@
     <?php if ($isLoggedIn): ?>
     <nav class="navbar">
         <div class="navbar-brand">
-            <a href="?page=dashboard"><?php echo APP_NAME; ?></a>
+            <img src="assets/images/logo.jpg" alt="DSP Logo">
         </div>
         <ul class="navbar-menu">
             <li><a href="?page=dashboard" class="<?php echo $page === 'dashboard' ? 'active' : ''; ?>">Dashboard</a></li>
