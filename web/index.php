@@ -32,11 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         require_once __DIR__ . '/pages/playlists.php';
         exit; // Stop execution after AJAX response
     }
-    // Handle schedule POST requests
-    if (in_array($_POST['action'], ['create_schedule', 'update_schedule', 'delete_schedule']) && $page === 'schedules') {
-        require_once __DIR__ . '/pages/schedules.php';
-        exit;
-    }
 }
 
 // Public pages (no login required)

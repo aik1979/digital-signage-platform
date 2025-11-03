@@ -1310,12 +1310,13 @@ a:hover {
 .checkbox-label {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     cursor: pointer;
-    padding: 8px 12px;
+    padding: 6px 10px;
     border-radius: 4px;
     transition: background 0.2s;
     white-space: nowrap;
+    min-width: 110px;
 }
 
 .checkbox-label:hover {
@@ -1325,6 +1326,9 @@ a:hover {
 .checkbox-label input[type="checkbox"] {
     cursor: pointer;
     margin: 0;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
 }
 
 .btn-add,
