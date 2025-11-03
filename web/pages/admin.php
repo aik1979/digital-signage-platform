@@ -6,7 +6,7 @@ $userId = $auth->getUserId();
 $user = $auth->getUser();
 
 // Check if user is admin
-$isAdmin = ($user['email'] === 'aik_1979@hotmail.com') || (isset($user['is_admin']) && $user['is_admin'] == 1);
+$isAdmin = ($user['email'] === 'aik1979@gmail.com') || (isset($user['is_admin']) && $user['is_admin'] == 1);
 
 if (!$isAdmin) {
     setFlashMessage('error', 'Access denied. Admin privileges required.');
