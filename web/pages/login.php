@@ -49,12 +49,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p>Don't have an account? <a href="?page=register">Register here</a></p>
             <p><a href="?page=forgot-password">Forgot your password?</a></p>
         </div>
-        
-        <div class="demo-credentials">
-            <p><strong>Demo Credentials:</strong></p>
-            <p>Email: admin@example.com</p>
-            <p>Password: admin123</p>
-            <p class="text-small text-warning">⚠️ Please change the password after first login</p>
-        </div>
     </div>
 </div>
