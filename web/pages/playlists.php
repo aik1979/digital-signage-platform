@@ -578,10 +578,14 @@ function addToPlaylist(contentId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            location.reload();
+            window.location.href = '?page=playlists&edit=' + playlistId;
         } else {
             alert('Failed to add item to playlist.');
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to add item to playlist.');
     });
 }
 
