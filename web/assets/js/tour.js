@@ -3,116 +3,107 @@
  * Provides interactive walkthroughs for each page
  */
 
-// Tour definitions for each page
-const tours = {
-    dashboard: {
-        steps: [
+// Get current page from URL
+function getCurrentPage() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('page') || 'dashboard';
+}
+
+// Get tour steps for a specific page (executed when tour starts, not on script load)
+function getTourSteps(page) {
+    const tourDefinitions = {
+        dashboard: [
             {
                 intro: "Welcome to your Digital Signage Platform! 🎉 Let's take a quick tour to help you get started."
             },
             {
-                element: document.querySelector('a[href="?page=screens"]'),
+                element: 'a[href="?page=screens"]',
                 intro: "Manage your screens here. Create virtual displays that will show your content.",
                 position: 'bottom'
             },
             {
-                element: document.querySelector('a[href="?page=content"]'),
+                element: 'a[href="?page=content"]',
                 intro: "Upload and manage your images and videos in the Content Library.",
                 position: 'bottom'
             },
             {
-                element: document.querySelector('a[href="?page=playlists"]'),
+                element: 'a[href="?page=playlists"]',
                 intro: "Create playlists to organize your content and control what plays on each screen.",
                 position: 'bottom'
             },
             {
-                element: document.querySelector('a[href="?page=schedules"]'),
+                element: 'a[href="?page=schedules"]',
                 intro: "Schedule when different playlists should play automatically.",
                 position: 'bottom'
             },
             {
-                element: document.querySelector('a[href="?page=getting-started"]'),
+                element: 'a[href="?page=getting-started"]',
                 intro: "New here? Check out the Getting Started Guide for step-by-step instructions!",
                 position: 'bottom'
             },
             {
                 intro: "That's it! Click 'Done' to start using the platform. You can restart this tour anytime by clicking the 🎯 Tour button."
             }
-        ]
-    },
-    
-    screens: {
-        steps: [
+        ],
+        
+        screens: [
             {
                 intro: "Welcome to the Screens page! Here you can manage all your digital displays."
             },
             {
-                element: document.querySelector('button:has-text("Add Screen"), button:contains("Add Screen"), .btn-primary'),
-                intro: "Click here to create a new screen. Each screen gets a unique device key.",
-                position: 'left'
+                intro: "Click the '➕ Add Screen' button to create a new screen. Each screen gets a unique device key that allows it to connect to your account."
             },
             {
                 intro: "After creating a screen, you can assign a playlist to it and get a viewer URL to display your content!"
             }
-        ]
-    },
-    
-    content: {
-        steps: [
+        ],
+        
+        content: [
             {
                 intro: "Welcome to your Content Library! This is where all your media files are stored."
             },
             {
-                element: document.querySelector('button:has-text("Upload"), button:contains("Upload")'),
-                intro: "Click here to upload new images or videos. Supported formats: JPG, PNG, MP4.",
-                position: 'left'
+                intro: "Click the '⬆️ Upload Content' button to upload new images or videos. Supported formats: JPG, PNG for images and MP4 for videos."
             },
             {
                 intro: "Once uploaded, you can add your content to playlists and display them on your screens!"
             }
-        ]
-    },
-    
-    playlists: {
-        steps: [
+        ],
+        
+        playlists: [
             {
                 intro: "Welcome to Playlists! Here you organize your content into sequences."
             },
             {
-                element: document.querySelector('button:has-text("Create Playlist"), button:contains("Create Playlist")'),
-                intro: "Click here to create a new playlist.",
-                position: 'left'
+                intro: "Click '➕ Create Playlist' to create a new playlist. Give it a name and choose a transition effect."
             },
             {
-                intro: "After creating a playlist, click Edit to add content items. You can drag to reorder them and set custom durations!"
+                intro: "After creating a playlist, click '✏️ Edit' to add content items. You can click items to add them and drag to reorder!"
             }
-        ]
-    },
-    
-    schedules: {
-        steps: [
+        ],
+        
+        schedules: [
             {
                 intro: "Welcome to Schedules! Automate when different playlists play on your screens."
             },
             {
                 intro: "Create time-based rules to automatically switch playlists. Perfect for showing different content at different times of day!"
             }
-        ]
-    },
-    
-    settings: {
-        steps: [
+        ],
+        
+        settings: [
             {
                 intro: "Welcome to Settings! Manage your account preferences here."
             },
             {
                 intro: "You can update your profile, change your password, and customize your platform experience."
+            },
+            {
+                intro: "Don't forget to check out the 🎯 Guided Tour Preferences section to control when tours appear!"
             }
-        ]
-    },
-    
-    'getting-started': {
-        steps: [
+        ],
+        
+        'getting-started': [
             {
                 intro: "This is the Getting Started Guide! Follow the 5 steps to set up your first digital sign."
             },
@@ -120,33 +111,45 @@ const tours = {
                 intro: "The guide covers everything from uploading content to viewing it in a web browser. Take your time and follow each step!"
             }
         ]
-    }
-};
-
-// Get current page from URL
-function getCurrentPage() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('page') || 'dashboard';
+    };
+    
+    return tourDefinitions[page] || null;
 }
 
 // Start the tour for the current page
 function startTour() {
     const currentPage = getCurrentPage();
-    const tour = tours[currentPage];
+    const tourSteps = getTourSteps(currentPage);
     
-    if (!tour) {
-        console.warn('No tour defined for page:', currentPage);
+    if (!tourSteps) {
+        alert('No tour available for this page.');
         return;
     }
     
-    // Filter out steps with missing elements
-    const validSteps = tour.steps.filter(step => {
-        if (!step.element) return true; // Keep intro-only steps
-        return step.element !== null; // Only keep steps where element exists
+    // Convert selector strings to actual elements
+    const steps = tourSteps.map(step => {
+        if (step.element && typeof step.element === 'string') {
+            const element = document.querySelector(step.element);
+            if (!element) {
+                // If element not found, return intro-only step
+                return {
+                    intro: step.intro
+                };
+            }
+            return {
+                element: element,
+                intro: step.intro,
+                position: step.position || 'bottom'
+            };
+        }
+        return step;
     });
     
+    // Filter out any null steps
+    const validSteps = steps.filter(step => step !== null);
+    
     if (validSteps.length === 0) {
-        console.warn('No valid tour steps found for page:', currentPage);
+        alert('Tour cannot start - no valid steps found.');
         return;
     }
     
@@ -192,21 +195,25 @@ function autoStartTour() {
     // 2. Tour has been seen in this session
     // 3. No tour exists for this page
     if (isTourDisabled()) {
+        console.log('Tours are disabled by user preference');
         return;
     }
     
     if (sessionStorage.getItem(`tour_seen_${currentPage}`) === 'true') {
+        console.log('Tour already seen in this session');
         return;
     }
     
-    if (!tours[currentPage]) {
+    if (!getTourSteps(currentPage)) {
+        console.log('No tour available for page:', currentPage);
         return;
     }
     
     // Auto-start after a short delay to let the page render
+    console.log('Auto-starting tour for page:', currentPage);
     setTimeout(() => {
         startTour();
-    }, 1000);
+    }, 1500);
 }
 
 // Initialize on page load
