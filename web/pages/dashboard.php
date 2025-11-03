@@ -7,9 +7,13 @@ $onlineScreens = $db->fetchOne("SELECT COUNT(*) as count FROM screens WHERE user
 $totalContent = $db->fetchOne("SELECT COUNT(*) as count FROM content WHERE user_id = ?", [$userId])['count'];
 $totalPlaylists = $db->fetchOne("SELECT COUNT(*) as count FROM playlists WHERE user_id = ?", [$userId])['count'];
 
-// Get recent screens
+// Get recent screens with playlist names
 $recentScreens = $db->fetchAll(
-    "SELECT * FROM screens WHERE user_id = ? ORDER BY last_heartbeat DESC LIMIT 5",
+    "SELECT s.*, p.name as playlist_name 
+     FROM screens s 
+     LEFT JOIN playlists p ON s.current_playlist_id = p.id
+     WHERE s.user_id = ? 
+     ORDER BY s.last_heartbeat DESC LIMIT 5",
     [$userId]
 );
 
@@ -71,6 +75,7 @@ $recentContent = $db->fetchAll(
                     <thead>
                         <tr>
                             <th>Name</th>
+                            <th>Playlist</th>
                             <th>Status</th>
                             <th>Last Seen</th>
                         </tr>
@@ -79,6 +84,13 @@ $recentContent = $db->fetchAll(
                         <?php foreach ($recentScreens as $screen): ?>
                         <tr>
                             <td><?php echo sanitize($screen['name']); ?></td>
+                            <td>
+                                <?php if ($screen['playlist_name']): ?>
+                                    <span class="badge badge-info"><?php echo sanitize($screen['playlist_name']); ?></span>
+                                <?php else: ?>
+                                    <span class="text-muted">Default</span>
+                                <?php endif; ?>
+                            </td>
                             <td>
                                 <?php if (isScreenOnline($screen['last_heartbeat'])): ?>
                                     <span class="badge badge-success">Online</span>

@@ -472,6 +472,18 @@ function addToPlaylist(element) {
 
 function removeFromPlaylist(element) {
     const contentId = element.dataset.contentId;
+    const type = element.dataset.type;
+    const duration = element.dataset.duration;
+    
+    // Get title and thumbnail from the element
+    const title = element.querySelector('.item-details strong').textContent;
+    const thumbnailElement = element.querySelector('.item-thumbnail img, .item-thumbnail .video-thumb');
+    let thumbnail = '';
+    
+    if (thumbnailElement.tagName === 'IMG') {
+        thumbnail = thumbnailElement.src;
+    }
+    
     element.remove();
     
     // Check if playlist is empty
@@ -480,8 +492,36 @@ function removeFromPlaylist(element) {
         playlistItems.innerHTML = '<p class="empty-message">No items in this playlist. Add content from the left.</p>';
     }
     
-    // Note: We don't add back to available content to keep it simple
-    // User can refresh page to see it again
+    // Add back to available content
+    const availableContent = document.getElementById('availableContent');
+    
+    // Remove empty message if exists
+    const emptyMsg = availableContent.querySelector('.empty-message');
+    if (emptyMsg) emptyMsg.remove();
+    
+    // Create content item
+    const item = document.createElement('div');
+    item.className = 'content-item';
+    item.dataset.contentId = contentId;
+    item.dataset.title = title;
+    item.dataset.duration = duration;
+    item.dataset.type = type;
+    item.dataset.thumbnail = thumbnail;
+    
+    const thumbHtml = type === 'image' && thumbnail
+        ? `<img src="${thumbnail}" alt="${title}">`
+        : '<div class="video-thumb">🎥</div>';
+    
+    item.innerHTML = `
+        <div class="content-thumbnail">${thumbHtml}</div>
+        <div class="content-details">
+            <strong>${title}</strong>
+            <span>${duration}s</span>
+        </div>
+        <button type="button" class="btn-add" onclick="addToPlaylist(this.parentElement)">+</button>
+    `;
+    
+    availableContent.appendChild(item);
 }
 
 function savePlaylist() {
@@ -510,17 +550,29 @@ function savePlaylist() {
         },
         body: `action=save_playlist_items&playlist_id=${playlistId}&items=${encodeURIComponent(JSON.stringify(items))}`
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('✅ Playlist saved successfully!');
-        } else {
-            alert('❌ Error: ' + data.message);
+    .then(response => {
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        return response.text();
+    })
+    .then(text => {
+        console.log('Raw response:', text);
+        try {
+            const data = JSON.parse(text);
+            if (data.success) {
+                alert('✅ Playlist saved successfully!');
+            } else {
+                alert('❌ Error: ' + data.message);
+            }
+        } catch (e) {
+            console.error('JSON parse error:', e);
+            console.error('Response text:', text);
+            alert('❌ Error: Invalid response from server. Check console for details.');
         }
     })
     .catch(error => {
-        alert('❌ Error saving playlist');
-        console.error(error);
+        console.error('Fetch error:', error);
+        alert('❌ Error saving playlist: ' + error.message);
     });
 }
 
