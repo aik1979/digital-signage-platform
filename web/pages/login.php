@@ -1,4 +1,9 @@
 <?php
+// Show account deleted message
+if (isset($_GET['deleted']) && $_GET['deleted'] == 1) {
+    setFlashMessage('success', 'Your account has been permanently deleted. Thank you for using Digital Signage Platform.');
+}
+
 // Handle login form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = sanitize($_POST['email'] ?? '');

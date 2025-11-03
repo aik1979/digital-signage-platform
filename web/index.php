@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action'])) {
 }
 
 // Public pages (no login required)
-$publicPages = ['login', 'register', 'forgot-password', 'reset-password'];
+$publicPages = ['login', 'register', 'forgot-password', 'reset-password', 'home'];
 
 // Redirect to login if not authenticated and trying to access protected page
 if (!$isLoggedIn && !in_array($page, $publicPages)) {
