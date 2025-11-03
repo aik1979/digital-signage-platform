@@ -152,168 +152,181 @@ $daysOfWeek = [
 ];
 ?>
 
-<div class="page-header">
-    <div class="header-content">
+<div class="space-y-8">
+    <!-- Page Header -->
+    <div class="flex items-center justify-between">
         <div>
-            <h1>Schedules</h1>
-            <p>Manage time-based playlist switching</p>
+            <h1 class="text-3xl font-bold text-white mb-2">Schedules</h1>
+            <p class="text-gray-400">Manage when playlists display on screens</p>
         </div>
-        <button type="button" class="btn btn-primary" onclick="toggleModal('createScheduleModal')">
+        <button type="button" class="bg-gradient-to-r from-dsp-blue to-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:from-blue-600 hover:to-blue-700 transition transform hover:scale-105 shadow-lg" onclick="toggleModal('createScheduleModal')">
             ➕ Create Schedule
         </button>
     </div>
-</div>
 
-<?php if (empty($schedules)): ?>
-<div class="empty-state">
-    <h2>📅 No Schedules Yet</h2>
-    <p>Create schedules to automatically switch playlists based on time and day.</p>
-    <p class="help-text">Example: Show breakfast menu 6-11am, lunch 11am-3pm, dinner 3pm-close</p>
-    <button type="button" class="btn btn-primary" onclick="toggleModal('createScheduleModal')">
-        Create Your First Schedule
-    </button>
-</div>
-<?php else: ?>
-<div class="schedules-list">
-    <?php foreach ($schedules as $schedule): ?>
-    <div class="schedule-card <?php echo $schedule['is_active'] ? '' : 'inactive'; ?>">
-        <div class="schedule-header">
-            <div>
-                <h3><?php echo sanitize($schedule['name']); ?></h3>
-                <div class="schedule-meta">
-                    <span>📺 <?php echo sanitize($schedule['screen_name']); ?></span>
-                    <span>📋 <?php echo sanitize($schedule['playlist_name']); ?></span>
-                </div>
-            </div>
-            <?php if (!$schedule['is_active']): ?>
-                <span class="badge badge-warning">Inactive</span>
-            <?php endif; ?>
-        </div>
-        
-        <div class="schedule-details">
-            <div class="detail-row">
-                <span class="detail-label">⏰ Time:</span>
-                <span class="detail-value"><?php echo date('g:i A', strtotime($schedule['start_time'])); ?> - <?php echo date('g:i A', strtotime($schedule['end_time'])); ?></span>
-            </div>
-            
-            <div class="detail-row">
-                <span class="detail-label">📅 Days:</span>
-                <span class="detail-value">
-                    <?php 
-                    $days = explode(',', $schedule['days_of_week']);
-                    $dayNames = array_map(function($d) use ($daysOfWeek) { return $daysOfWeek[$d]; }, $days);
-                    echo implode(', ', $dayNames);
-                    ?>
-                </span>
-            </div>
-            
-            <?php if ($schedule['start_date'] || $schedule['end_date']): ?>
-            <div class="detail-row">
-                <span class="detail-label">📆 Date Range:</span>
-                <span class="detail-value">
-                    <?php 
-                    if ($schedule['start_date']) echo date('M j, Y', strtotime($schedule['start_date']));
-                    if ($schedule['start_date'] && $schedule['end_date']) echo ' - ';
-                    if ($schedule['end_date']) echo date('M j, Y', strtotime($schedule['end_date']));
-                    ?>
-                </span>
-            </div>
-            <?php endif; ?>
-        </div>
-        
-        <div class="schedule-actions">
-            <a href="?page=schedules&edit=<?php echo $schedule['id']; ?>" class="btn btn-secondary btn-sm">
-                ✏️ Edit
-            </a>
-            <button type="button" class="btn btn-danger btn-sm" 
-                    onclick="confirmDelete(<?php echo $schedule['id']; ?>, '<?php echo addslashes($schedule['name']); ?>')">
-                🗑️ Delete
-            </button>
+    <?php if (empty($schedules)): ?>
+    <!-- Empty State -->
+    <div class="bg-gray-800 border border-gray-700 rounded-lg p-12 text-center">
+        <div class="text-6xl mb-4">📅</div>
+        <h2 class="text-2xl font-bold text-white mb-2">No Schedules Yet</h2>
+        <p class="text-gray-400 mb-6">Create schedules to automatically display different playlists at specific times.</p>
+        <button type="button" class="bg-gradient-to-r from-dsp-blue to-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:from-blue-600 hover:to-blue-700 transition transform hover:scale-105 shadow-lg" onclick="toggleModal('createScheduleModal')">
+            Create Your First Schedule
+        </button>
+    </div>
+    <?php else: ?>
+    <!-- Schedules Table -->
+    <div class="bg-gray-800 border border-gray-700 rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-gray-700 bg-gray-900">
+                        <th class="text-left py-3 px-4 text-gray-300 font-semibold">Screen</th>
+                        <th class="text-left py-3 px-4 text-gray-300 font-semibold">Playlist</th>
+                        <th class="text-left py-3 px-4 text-gray-300 font-semibold">Days</th>
+                        <th class="text-left py-3 px-4 text-gray-300 font-semibold">Time</th>
+                        <th class="text-left py-3 px-4 text-gray-300 font-semibold">Date Range</th>
+                        <th class="text-left py-3 px-4 text-gray-300 font-semibold">Status</th>
+                        <th class="text-left py-3 px-4 text-gray-300 font-semibold">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($schedules as $schedule): ?>
+                    <tr class="border-b border-gray-700 hover:bg-gray-700 transition">
+                        <td class="py-3 px-4 text-white"><?php echo sanitize($schedule['screen_name']); ?></td>
+                        <td class="py-3 px-4 text-white"><?php echo sanitize($schedule['playlist_name']); ?></td>
+                        <td class="py-3 px-4 text-gray-400 text-sm">
+                            <?php
+                            $days = json_decode($schedule['days_of_week'], true);
+                            $dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                            $activeDays = [];
+                            foreach ($days as $day => $active) {
+                                if ($active) $activeDays[] = $dayNames[$day];
+                            }
+                            echo implode(', ', $activeDays);
+                            ?>
+                        </td>
+                        <td class="py-3 px-4 text-gray-400 text-sm">
+                            <?php echo date('g:i A', strtotime($schedule['start_time'])); ?> - 
+                            <?php echo date('g:i A', strtotime($schedule['end_time'])); ?>
+                        </td>
+                        <td class="py-3 px-4 text-gray-400 text-sm">
+                            <?php if ($schedule['start_date'] && $schedule['end_date']): ?>
+                                <?php echo date('M j', strtotime($schedule['start_date'])); ?> - 
+                                <?php echo date('M j, Y', strtotime($schedule['end_date'])); ?>
+                            <?php else: ?>
+                                Always
+                            <?php endif; ?>
+                        </td>
+                        <td class="py-3 px-4">
+                            <?php if ($schedule['is_active']): ?>
+                                <span class="inline-block bg-green-600 text-white text-xs px-2 py-1 rounded">Active</span>
+                            <?php else: ?>
+                                <span class="inline-block bg-gray-600 text-white text-xs px-2 py-1 rounded">Inactive</span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="flex space-x-2">
+                                <a href="?page=schedules&edit=<?php echo $schedule['id']; ?>" class="bg-dsp-blue text-white font-semibold py-1 px-3 text-xs rounded-md hover:bg-blue-600 transition">
+                                    ✏️ Edit
+                                </a>
+                                <button type="button" class="bg-gradient-to-r from-dsp-red to-red-600 text-white font-semibold py-1 px-3 text-xs rounded-md hover:from-red-600 hover:to-red-700 transition" onclick="confirmDelete(<?php echo $schedule['id']; ?>)">
+                                    🗑️
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
     </div>
-    <?php endforeach; ?>
+    <?php endif; ?>
 </div>
-<?php endif; ?>
 
 <!-- Create Schedule Modal -->
-<div id="createScheduleModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Create New Schedule</h2>
-            <button type="button" class="close-btn" onclick="toggleModal('createScheduleModal')">&times;</button>
+<div id="createScheduleModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display: none;">
+    <div class="bg-gray-800 rounded-lg shadow-2xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-gray-700">
+        <div class="flex items-center justify-between p-6 border-b border-gray-700">
+            <h2 class="text-2xl font-bold text-white">Create New Schedule</h2>
+            <button type="button" class="text-gray-400 hover:text-white text-3xl leading-none" onclick="toggleModal('createScheduleModal')">&times;</button>
         </div>
         <form method="POST" action="?page=schedules">
-            <input type="hidden" name="action" value="create_schedule">
-            
-            <div class="form-group">
-                <label for="name">Schedule Name *</label>
-                <input type="text" id="name" name="name" required 
-                       placeholder="e.g., Breakfast Hours, Weekend Special">
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="screen_id">Screen *</label>
-                    <select id="screen_id" name="screen_id" required>
-                        <option value="">-- Select Screen --</option>
-                        <?php foreach ($screens as $screen): ?>
-                            <option value="<?php echo $screen['id']; ?>"><?php echo sanitize($screen['name']); ?></option>
-                        <?php endforeach; ?>
-                    </select>
+            <div class="p-6 space-y-4">
+                <input type="hidden" name="action" value="create_schedule">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="screen_id" class="block text-sm font-medium text-gray-300 mb-2">Screen *</label>
+                        <select id="screen_id" name="screen_id" required class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
+                            <option value="">Select a screen...</option>
+                            <?php foreach ($screens as $screen): ?>
+                                <option value="<?php echo $screen['id']; ?>"><?php echo htmlspecialchars($screen['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="playlist_id" class="block text-sm font-medium text-gray-300 mb-2">Playlist *</label>
+                        <select id="playlist_id" name="playlist_id" required class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
+                            <option value="">Select a playlist...</option>
+                            <?php foreach ($playlists as $playlist): ?>
+                                <option value="<?php echo $playlist['id']; ?>"><?php echo htmlspecialchars($playlist['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="playlist_id">Playlist *</label>
-                    <select id="playlist_id" name="playlist_id" required>
-                        <option value="">-- Select Playlist --</option>
-                        <?php foreach ($playlists as $playlist): ?>
-                            <option value="<?php echo $playlist['id']; ?>"><?php echo sanitize($playlist['name']); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="start_time">Start Time *</label>
-                    <input type="time" id="start_time" name="start_time" required>
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Schedule Name *</label>
+                    <input type="text" id="name" name="name" required placeholder="e.g., Weekday Breakfast"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
                 </div>
                 
-                <div class="form-group">
-                    <label for="end_time">End Time *</label>
-                    <input type="time" id="end_time" name="end_time" required>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label>Days of Week *</label>
-                <div class="checkbox-group">
-                    <?php foreach ($daysOfWeek as $value => $label): ?>
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="days_of_week[]" value="<?php echo $value; ?>">
-                            <?php echo $label; ?>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Days of Week *</label>
+                    <div class="grid grid-cols-7 gap-2">
+                        <?php foreach ($daysOfWeek as $index => $day): ?>
+                        <label class="flex items-center justify-center bg-gray-700 border border-gray-600 rounded-lg p-2 cursor-pointer hover:bg-gray-600 transition">
+                            <input type="checkbox" name="days_of_week[]" value="<?php echo $index; ?>" class="sr-only peer">
+                            <span class="text-sm text-gray-300 peer-checked:text-white peer-checked:font-bold"><?php echo substr($day, 0, 3); ?></span>
                         </label>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="start_date">Start Date (Optional)</label>
-                    <input type="date" id="start_date" name="start_date">
-                    <small>Leave blank for no start date limit</small>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="end_date">End Date (Optional)</label>
-                    <input type="date" id="end_date" name="end_date">
-                    <small>Leave blank for no end date limit</small>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="start_time" class="block text-sm font-medium text-gray-300 mb-2">Start Time *</label>
+                        <input type="time" id="start_time" name="start_time" required 
+                               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
+                    </div>
+                    
+                    <div>
+                        <label for="end_time" class="block text-sm font-medium text-gray-300 mb-2">End Time *</label>
+                        <input type="time" id="end_time" name="end_time" required 
+                               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="start_date" class="block text-sm font-medium text-gray-300 mb-2">Start Date (Optional)</label>
+                        <input type="date" id="start_date" name="start_date" 
+                               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
+                    </div>
+                    
+                    <div>
+                        <label for="end_date" class="block text-sm font-medium text-gray-300 mb-2">End Date (Optional)</label>
+                        <input type="date" id="end_date" name="end_date" 
+                               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
+                    </div>
                 </div>
             </div>
             
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="toggleModal('createScheduleModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Create Schedule</button>
+            <div class="flex justify-end space-x-3 p-6 border-t border-gray-700 bg-gray-900">
+                <button type="button" class="bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg hover:bg-gray-600 transition" onclick="toggleModal('createScheduleModal')">Cancel</button>
+                <button type="submit" class="bg-gradient-to-r from-dsp-blue to-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:from-blue-600 hover:to-blue-700 transition shadow-lg">Create Schedule</button>
             </div>
         </form>
     </div>
@@ -321,109 +334,110 @@ $daysOfWeek = [
 
 <!-- Edit Schedule Modal -->
 <?php if ($editSchedule): ?>
-<div id="editScheduleModal" class="modal" style="display: block;">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Edit Schedule</h2>
-            <button type="button" class="close-btn" onclick="window.location.href='?page=schedules'">&times;</button>
+<div id="editScheduleModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-lg shadow-2xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-gray-700">
+        <div class="flex items-center justify-between p-6 border-b border-gray-700">
+            <h2 class="text-2xl font-bold text-white">Edit Schedule</h2>
+            <button type="button" class="text-gray-400 hover:text-white text-3xl leading-none" onclick="window.location.href='?page=schedules'">&times;</button>
         </div>
         <form method="POST" action="?page=schedules">
-            <input type="hidden" name="action" value="update_schedule">
-            <input type="hidden" name="schedule_id" value="<?php echo $editSchedule['id']; ?>">
-            
-            <div class="form-group">
-                <label for="edit_name">Schedule Name *</label>
-                <input type="text" id="edit_name" name="name" required 
-                       value="<?php echo sanitize($editSchedule['name']); ?>">
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="edit_screen_id">Screen *</label>
-                    <select id="edit_screen_id" name="screen_id" required>
-                        <?php foreach ($screens as $screen): ?>
-                            <option value="<?php echo $screen['id']; ?>" 
-                                    <?php echo $editSchedule['screen_id'] == $screen['id'] ? 'selected' : ''; ?>>
-                                <?php echo sanitize($screen['name']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+            <div class="p-6 space-y-4">
+                <input type="hidden" name="action" value="update_schedule">
+                <input type="hidden" name="schedule_id" value="<?php echo $editSchedule['id']; ?>">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="edit_screen_id" class="block text-sm font-medium text-gray-300 mb-2">Screen *</label>
+                        <select id="edit_screen_id" name="screen_id" required class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
+                            <?php foreach ($screens as $screen): ?>
+                                <option value="<?php echo $screen['id']; ?>" <?php echo ($screen['id'] == $editSchedule['screen_id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($screen['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="edit_playlist_id" class="block text-sm font-medium text-gray-300 mb-2">Playlist *</label>
+                        <select id="edit_playlist_id" name="playlist_id" required class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
+                            <?php foreach ($playlists as $playlist): ?>
+                                <option value="<?php echo $playlist['id']; ?>" <?php echo ($playlist['id'] == $editSchedule['playlist_id']) ? 'selected' : ''; ?>><?php echo htmlspecialchars($playlist['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="edit_playlist_id">Playlist *</label>
-                    <select id="edit_playlist_id" name="playlist_id" required>
-                        <?php foreach ($playlists as $playlist): ?>
-                            <option value="<?php echo $playlist['id']; ?>" 
-                                    <?php echo $editSchedule['playlist_id'] == $playlist['id'] ? 'selected' : ''; ?>>
-                                <?php echo sanitize($playlist['name']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="edit_start_time">Start Time *</label>
-                    <input type="time" id="edit_start_time" name="start_time" required 
-                           value="<?php echo $editSchedule['start_time']; ?>">
+                <div>
+                    <label for="edit_name" class="block text-sm font-medium text-gray-300 mb-2">Schedule Name *</label>
+                    <input type="text" id="edit_name" name="name" required 
+                           value="<?php echo sanitize($editSchedule['name']); ?>"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
                 </div>
                 
-                <div class="form-group">
-                    <label for="edit_end_time">End Time *</label>
-                    <input type="time" id="edit_end_time" name="end_time" required 
-                           value="<?php echo $editSchedule['end_time']; ?>">
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label>Days of Week *</label>
-                <div class="checkbox-group">
-                    <?php 
-                    $selectedDays = explode(',', $editSchedule['days_of_week']);
-                    foreach ($daysOfWeek as $value => $label): 
-                    ?>
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="days_of_week[]" value="<?php echo $value; ?>"
-                                   <?php echo in_array($value, $selectedDays) ? 'checked' : ''; ?>>
-                            <?php echo $label; ?>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Days of Week *</label>
+                    <div class="grid grid-cols-7 gap-2">
+                        <?php 
+                        $selectedDays = explode(',', $editSchedule['days_of_week']);
+                        foreach ($daysOfWeek as $index => $day): 
+                            $checked = in_array($index, $selectedDays) ? 'checked' : '';
+                        ?>
+                        <label class="flex items-center justify-center bg-gray-700 border border-gray-600 rounded-lg p-2 cursor-pointer hover:bg-gray-600 transition">
+                            <input type="checkbox" name="days_of_week[]" value="<?php echo $index; ?>" <?php echo $checked; ?> class="sr-only peer">
+                            <span class="text-sm text-gray-300 peer-checked:text-white peer-checked:font-bold"><?php echo substr($day, 0, 3); ?></span>
                         </label>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="edit_start_date">Start Date (Optional)</label>
-                    <input type="date" id="edit_start_date" name="start_date" 
-                           value="<?php echo $editSchedule['start_date'] ?? ''; ?>">
+                        <?php endforeach; ?>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="edit_end_date">End Date (Optional)</label>
-                    <input type="date" id="edit_end_date" name="end_date" 
-                           value="<?php echo $editSchedule['end_date'] ?? ''; ?>">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="edit_start_time" class="block text-sm font-medium text-gray-300 mb-2">Start Time *</label>
+                        <input type="time" id="edit_start_time" name="start_time" required 
+                               value="<?php echo $editSchedule['start_time']; ?>"
+                               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
+                    </div>
+                    
+                    <div>
+                        <label for="edit_end_time" class="block text-sm font-medium text-gray-300 mb-2">End Time *</label>
+                        <input type="time" id="edit_end_time" name="end_time" required 
+                               value="<?php echo $editSchedule['end_time']; ?>"
+                               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="edit_start_date" class="block text-sm font-medium text-gray-300 mb-2">Start Date (Optional)</label>
+                        <input type="date" id="edit_start_date" name="start_date" 
+                               value="<?php echo $editSchedule['start_date'] ?? ''; ?>"
+                               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
+                    </div>
+                    
+                    <div>
+                        <label for="edit_end_date" class="block text-sm font-medium text-gray-300 mb-2">End Date (Optional)</label>
+                        <input type="date" id="edit_end_date" name="end_date" 
+                               value="<?php echo $editSchedule['end_date'] ?? ''; ?>"
+                               class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="flex items-center">
+                        <input type="checkbox" name="is_active" <?php echo $editSchedule['is_active'] ? 'checked' : ''; ?> class="w-4 h-4 text-dsp-blue bg-gray-700 border-gray-600 rounded focus:ring-dsp-blue focus:ring-2">
+                        <span class="ml-2 text-sm text-gray-300">Schedule is active</span>
+                    </label>
                 </div>
             </div>
             
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" name="is_active" <?php echo $editSchedule['is_active'] ? 'checked' : ''; ?>>
-                    Schedule is active
-                </label>
-            </div>
-            
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="window.location.href='?page=schedules'">Cancel</button>
-                <button type="submit" class="btn btn-primary">Update Schedule</button>
+            <div class="flex justify-end space-x-3 p-6 border-t border-gray-700 bg-gray-900">
+                <button type="button" class="bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg hover:bg-gray-600 transition" onclick="window.location.href='?page=schedules'">Cancel</button>
+                <button type="submit" class="bg-gradient-to-r from-dsp-blue to-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:from-blue-600 hover:to-blue-700 transition shadow-lg">Update Schedule</button>
             </div>
         </form>
     </div>
 </div>
 <?php endif; ?>
 
-<!-- Delete Form -->
+<!-- Delete Confirmation Form -->
 <form id="deleteForm" method="POST" action="?page=schedules" style="display: none;">
     <input type="hidden" name="action" value="delete_schedule">
     <input type="hidden" name="schedule_id" id="deleteScheduleId">
@@ -433,14 +447,14 @@ $daysOfWeek = [
 function toggleModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal.style.display === 'none') {
-        modal.style.display = 'block';
+        modal.style.display = 'flex';
     } else {
         modal.style.display = 'none';
     }
 }
 
-function confirmDelete(scheduleId, scheduleName) {
-    if (confirm('Are you sure you want to delete "' + scheduleName + '"?\n\nThis action cannot be undone.')) {
+function confirmDelete(scheduleId) {
+    if (confirm('Are you sure you want to delete this schedule?\\n\\nThis action cannot be undone.')) {
         document.getElementById('deleteScheduleId').value = scheduleId;
         document.getElementById('deleteForm').submit();
     }
@@ -448,11 +462,17 @@ function confirmDelete(scheduleId, scheduleName) {
 
 // Close modal when clicking outside
 window.onclick = function(event) {
-    if (event.target.classList.contains('modal')) {
-        event.target.style.display = 'none';
-        if (window.location.search.includes('edit')) {
-            window.location.href = '?page=schedules';
-        }
+    if (event.target.classList.contains('fixed')) {
+        const modals = document.querySelectorAll('.fixed');
+        modals.forEach(modal => {
+            if (modal.contains(event.target) && event.target === modal) {
+                if (window.location.search.includes('edit')) {
+                    window.location.href = '?page=schedules';
+                } else {
+                    modal.style.display = 'none';
+                }
+            }
+        });
     }
 }
 </script>
