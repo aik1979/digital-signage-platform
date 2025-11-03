@@ -56,6 +56,14 @@ class ContentUploader {
             list($width, $height) = getimagesize($filePath);
         }
         
+        // Get video duration if video
+        if ($fileType === 'video') {
+            $videoDuration = $this->getVideoDuration($filePath);
+            if ($videoDuration > 0) {
+                $duration = $videoDuration;
+            }
+        }
+        
         // Generate thumbnail
         $thumbnailPath = null;
         if ($fileType === 'image') {
@@ -169,6 +177,37 @@ class ContentUploader {
         imagedestroy($thumbnail);
         
         return 'uploads/thumbnails/' . $thumbnailFilename;
+    }
+    
+    /**
+     * Get video duration in seconds
+     */
+    private function getVideoDuration($filePath) {
+        // Try using getID3 if available
+        if (class_exists('getID3')) {
+            try {
+                $getID3 = new getID3();
+                $fileInfo = $getID3->analyze($filePath);
+                if (isset($fileInfo['playtime_seconds'])) {
+                    return (int)round($fileInfo['playtime_seconds']);
+                }
+            } catch (Exception $e) {
+                // Fall through to ffprobe
+            }
+        }
+        
+        // Try using ffprobe (most reliable)
+        $ffprobe = shell_exec("which ffprobe 2>/dev/null");
+        if ($ffprobe) {
+            $cmd = "ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 " . escapeshellarg($filePath) . " 2>&1";
+            $duration = shell_exec($cmd);
+            if ($duration && is_numeric(trim($duration))) {
+                return (int)round(floatval(trim($duration)));
+            }
+        }
+        
+        // Fallback: return 0 to use default duration
+        return 0;
     }
     
     /**

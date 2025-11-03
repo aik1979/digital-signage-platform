@@ -207,7 +207,7 @@ $totalSize = $db->fetchOne("SELECT SUM(file_size) as total FROM content WHERE us
         </div>
         
         <div class="content-actions">
-            <a href="<?php echo $item['file_path']; ?>" target="_blank" class="btn btn-secondary btn-sm">👁️ View</a>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="viewContent(<?php echo $item['id']; ?>, '<?php echo addslashes($item['title']); ?>', '<?php echo $item['file_path']; ?>', '<?php echo $item['file_type']; ?>')">👁️ View</button>
             <a href="?page=content&edit=<?php echo $item['id']; ?>" class="btn btn-secondary btn-sm">✏️ Edit</a>
             <button type="button" class="btn btn-danger btn-sm" 
                     onclick="confirmDelete(<?php echo $item['id']; ?>, '<?php echo addslashes($item['title']); ?>')">
@@ -249,7 +249,7 @@ $totalSize = $db->fetchOne("SELECT SUM(file_size) as total FROM content WHERE us
             <td><?php echo formatFileSize($item['file_size']); ?></td>
             <td><?php echo timeAgo($item['created_at']); ?></td>
             <td>
-                <a href="<?php echo $item['file_path']; ?>" target="_blank" class="btn btn-secondary btn-sm">View</a>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="viewContent(<?php echo $item['id']; ?>, '<?php echo addslashes($item['title']); ?>', '<?php echo $item['file_path']; ?>', '<?php echo $item['file_type']; ?>')">View</button>
                 <a href="?page=content&edit=<?php echo $item['id']; ?>" class="btn btn-secondary btn-sm">Edit</a>
                 <button type="button" class="btn btn-danger btn-sm" 
                         onclick="confirmDelete(<?php echo $item['id']; ?>, '<?php echo addslashes($item['title']); ?>')">
@@ -346,6 +346,19 @@ $totalSize = $db->fetchOne("SELECT SUM(file_size) as total FROM content WHERE us
 </div>
 <?php endif; ?>
 
+<!-- View Content Lightbox -->
+<div id="viewLightbox" class="lightbox" style="display: none;" onclick="closeLightbox(event)">
+    <div class="lightbox-content">
+        <div class="lightbox-header">
+            <h3 id="lightboxTitle"></h3>
+            <button type="button" class="close-btn" onclick="closeLightbox()">&times;</button>
+        </div>
+        <div class="lightbox-body" id="lightboxBody">
+            <!-- Content will be loaded here -->
+        </div>
+    </div>
+</div>
+
 <!-- Delete Form -->
 <form id="deleteForm" method="POST" action="?page=content" style="display: none;">
     <input type="hidden" name="action" value="delete_content">
@@ -353,6 +366,48 @@ $totalSize = $db->fetchOne("SELECT SUM(file_size) as total FROM content WHERE us
 </form>
 
 <script>
+function viewContent(id, title, path, type) {
+    const lightbox = document.getElementById('viewLightbox');
+    const lightboxTitle = document.getElementById('lightboxTitle');
+    const lightboxBody = document.getElementById('lightboxBody');
+    
+    lightboxTitle.textContent = title;
+    
+    if (type === 'image') {
+        lightboxBody.innerHTML = '<img src="' + path + '" alt="' + title + '" style="max-width: 100%; max-height: 80vh; display: block; margin: 0 auto;">';
+    } else if (type === 'video') {
+        lightboxBody.innerHTML = '<video controls autoplay style="max-width: 100%; max-height: 80vh; display: block; margin: 0 auto;"><source src="' + path + '" type="video/mp4">Your browser does not support the video tag.</video>';
+    }
+    
+    lightbox.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(event) {
+    // Only close if clicking the backdrop or close button
+    if (!event || event.target.id === 'viewLightbox' || event.target.classList.contains('close-btn')) {
+        const lightbox = document.getElementById('viewLightbox');
+        const lightboxBody = document.getElementById('lightboxBody');
+        
+        // Stop any playing videos
+        const videos = lightboxBody.getElementsByTagName('video');
+        for (let video of videos) {
+            video.pause();
+        }
+        
+        lightbox.style.display = 'none';
+        lightboxBody.innerHTML = '';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// Close lightbox with Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeLightbox();
+    }
+});
+
 function toggleModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal.style.display === 'none') {
