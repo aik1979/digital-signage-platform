@@ -439,16 +439,16 @@ if (isset($_GET['edit'])) {
                     <label>Share URL</label>
                     <?php if ($shortUrl): ?>
                     <div class="key-box">
-                        <code id="shareUrl"><?php echo rtrim(APP_URL, '/'); ?>/s/<?php echo $shortUrl['short_code']; ?></code>
+                        <code id="shareUrl" onclick="copyShareUrl()" style="cursor: pointer;" title="Click to copy"><?php echo rtrim(APP_URL, '/'); ?>/s/<?php echo $shortUrl['short_code']; ?></code>
                         <button type="button" class="btn btn-secondary btn-sm" onclick="copyShareUrl()">📋 Copy</button>
                     </div>
-                    <small>Short URL (<?php echo $shortUrl['clicks'] ?? 0; ?> views)</small>
+                    <small>Short URL - Click to copy (<?php echo $shortUrl['clicks'] ?? 0; ?> views)</small>
                     <?php else: ?>
                     <div class="key-box">
-                        <code id="shareUrl"><?php echo APP_URL; ?>view/<?php echo $editPlaylist['share_token']; ?></code>
+                        <code id="shareUrl" onclick="copyShareUrl()" style="cursor: pointer;" title="Click to copy"><?php echo APP_URL; ?>view/<?php echo $editPlaylist['share_token']; ?></code>
                         <button type="button" class="btn btn-secondary btn-sm" onclick="copyShareUrl()">📋 Copy</button>
                     </div>
-                    <small>Enable sharing and save to generate short URL</small>
+                    <small>Click URL to copy - Enable sharing and save to generate short URL</small>
                     <?php endif; ?>
                 </div>
                 <?php endif; ?>

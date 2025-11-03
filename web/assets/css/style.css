@@ -938,6 +938,16 @@ a:hover {
     word-break: break-all;
 }
 
+.key-box code[onclick] {
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.key-box code[onclick]:hover {
+    background: #f0f0f0;
+    color: #3498DB;
+}
+
 /* Playlists */
 .playlists-grid {
     display: grid;
