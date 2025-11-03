@@ -1230,6 +1230,101 @@ a:hover {
     font-style: italic;
 }
 
+/* Schedules */
+.schedules-list {
+    display: grid;
+    gap: 20px;
+}
+
+.schedule-card {
+    background: white;
+    border: 1px solid #DDDDDD;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.schedule-card.inactive {
+    opacity: 0.6;
+    background: #F5F5F5;
+}
+
+.schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.schedule-header h3 {
+    margin: 0 0 8px 0;
+    color: #333;
+}
+
+.schedule-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 14px;
+    color: #666;
+}
+
+.schedule-details {
+    margin: 15px 0;
+    padding: 15px;
+    background: #F9F9F9;
+    border-radius: 6px;
+}
+
+.detail-row {
+    display: flex;
+    padding: 8px 0;
+    border-bottom: 1px solid #EEEEEE;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 600;
+    min-width: 120px;
+    color: #555;
+}
+
+.detail-value {
+    color: #333;
+}
+
+.schedule-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.checkbox-label:hover {
+    background: #F5F5F5;
+}
+
+.checkbox-label input[type="checkbox"] {
+    cursor: pointer;
+}
+
 .btn-add,
 .btn-remove {
     width: 32px;
