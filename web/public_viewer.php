@@ -53,6 +53,15 @@ $items = $db->fetchAll(
     [$playlistId]
 );
 
+// Fix file paths to be absolute URLs
+foreach ($items as &$item) {
+    // If path doesn't start with http, prepend the base URL
+    if (!preg_match('#^https?://#', $item['file_path'])) {
+        $item['file_path'] = rtrim(APP_URL, '/') . '/' . ltrim($item['file_path'], '/');
+    }
+}
+unset($item);
+
 if (empty($items)) {
     die('Error: Playlist is empty.');
 }

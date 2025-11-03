@@ -3,6 +3,9 @@
 # Enable rewrite engine
 RewriteEngine On
 
+# Short URL redirect: /s/CODE -> s.php?c=CODE
+RewriteRule ^s/([a-zA-Z0-9]+)$ s.php?c=$1 [L,QSA]
+
 # Clean URL for public viewer: /view/TOKEN -> public_viewer.php?token=TOKEN
 RewriteRule ^view/([a-zA-Z0-9_-]+)$ public_viewer.php?token=$1 [L,QSA]
 

@@ -70,6 +70,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     'is_default' => $isDefault
                 ], 'id = :id', ['id' => $playlistId]);
                 
+                // Generate short URL if sharing is enabled and doesn't exist
+                if ($shareEnabled) {
+                    $existingShort = $db->fetchOne(
+                        "SELECT short_code FROM short_urls WHERE playlist_id = ? AND user_id = ?",
+                        [$playlistId, $userId]
+                    );
+                    
+                    if (!$existingShort) {
+                        // Get playlist share token
+                        $playlist = $db->fetchOne("SELECT share_token FROM playlists WHERE id = ?", [$playlistId]);
+                        
+                        // Generate short code (6 characters)
+                        $shortCode = substr(str_shuffle('abcdefghijklmnopqrstuvwxyz0123456789'), 0, 6);
+                        
+                        // Ensure uniqueness
+                        while ($db->fetchOne("SELECT id FROM short_urls WHERE short_code = ?", [$shortCode])) {
+                            $shortCode = substr(str_shuffle('abcdefghijklmnopqrstuvwxyz0123456789'), 0, 6);
+                        }
+                        
+                        $originalUrl = rtrim(APP_URL, '/') . '/view/' . $playlist['share_token'];
+                        
+                        $db->insert('short_urls', [
+                            'short_code' => $shortCode,
+                            'original_url' => $originalUrl,
+                            'playlist_id' => $playlistId,
+                            'user_id' => $userId,
+                            'is_active' => 1
+                        ]);
+                    }
+                }
+                
                 logActivity($db, $userId, 'playlist_updated', 'playlist', $playlistId, 'Updated playlist: ' . $name);
                 setFlashMessage('success', 'Playlist updated successfully!');
                 redirect('playlists', ['edit' => $playlistId]);
@@ -383,13 +414,28 @@ if (isset($_GET['edit'])) {
                 </div>
                 
                 <?php if ($editPlaylist['share_token']): ?>
+                <?php 
+                // Get short URL if exists
+                $shortUrl = $db->fetchOne(
+                    "SELECT short_code FROM short_urls WHERE playlist_id = ? AND user_id = ? AND is_active = 1",
+                    [$editPlaylist['id'], $userId]
+                );
+                ?>
                 <div class="form-group">
                     <label>Share URL</label>
+                    <?php if ($shortUrl): ?>
+                    <div class="key-box">
+                        <code id="shareUrl"><?php echo rtrim(APP_URL, '/'); ?>/s/<?php echo $shortUrl['short_code']; ?></code>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="copyShareUrl()">📋 Copy</button>
+                    </div>
+                    <small>Short URL (<?php echo $shortUrl['clicks'] ?? 0; ?> views)</small>
+                    <?php else: ?>
                     <div class="key-box">
                         <code id="shareUrl"><?php echo APP_URL; ?>view/<?php echo $editPlaylist['share_token']; ?></code>
                         <button type="button" class="btn btn-secondary btn-sm" onclick="copyShareUrl()">📋 Copy</button>
                     </div>
-                    <small>Share this URL to allow browser-based viewing</small>
+                    <small>Enable sharing and save to generate short URL</small>
+                    <?php endif; ?>
                 </div>
                 <?php endif; ?>
                 
