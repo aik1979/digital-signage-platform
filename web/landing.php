@@ -24,8 +24,15 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
         }
         
         .gradient-text {
@@ -62,21 +69,30 @@
         }
         
         .hero-bg {
-            background: radial-gradient(circle at 20% 50%, rgba(52, 152, 219, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(92, 184, 92, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 20%, rgba(231, 76, 60, 0.1) 0%, transparent 50%);
+            background: radial-gradient(circle at 20% 50%, rgba(52, 152, 219, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(92, 184, 92, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 20%, rgba(231, 76, 60, 0.15) 0%, transparent 50%);
+        }
+        
+        .full-width-section {
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white overflow-x-hidden">
+<body class="bg-gray-900 text-white">
     
     <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-90 backdrop-blur-md border-b border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-95 backdrop-blur-md border-b border-gray-800">
+        <div class="w-full px-6 lg:px-12">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
                     <img src="assets/images/logo.svg" alt="DSP Logo" class="h-10 w-auto">
-                    <span class="ml-3 text-xl font-bold gradient-text">Digital Signage Platform</span>
+                    <span class="ml-3 text-xl font-bold gradient-text hidden sm:inline">Digital Signage Platform</span>
                 </div>
                 <div class="flex items-center space-x-4">
                     <a href="?page=login" class="text-gray-300 hover:text-white px-4 py-2 rounded-md text-sm font-medium transition">Login</a>
@@ -86,15 +102,15 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center justify-center hero-bg pt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-            <div class="hero-content">
-                <h1 class="text-6xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight">
+    <!-- Hero Section - Full Width -->
+    <section class="full-width-section min-h-screen flex items-center justify-center hero-bg pt-16">
+        <div class="w-full px-6 lg:px-12 py-20 text-center">
+            <div class="hero-content max-w-6xl mx-auto">
+                <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight">
                     Transform Your
                     <span class="gradient-text block">Digital Displays</span>
                 </h1>
-                <p class="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed">
+                <p class="text-lg sm:text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed px-4">
                     Manage content, create stunning playlists, and control screens from anywhere. 
                     The modern way to power your digital signage.
                 </p>
@@ -108,17 +124,17 @@
                 </div>
                 
                 <!-- Stats -->
-                <div class="grid grid-cols-3 gap-8 max-w-3xl mx-auto stats-grid">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-4xl mx-auto stats-grid px-4">
                     <div class="stat-item">
-                        <div class="text-4xl font-black gradient-text">100%</div>
+                        <div class="text-4xl md:text-5xl font-black gradient-text">100%</div>
                         <div class="text-gray-400 text-sm mt-2">Free to Start</div>
                     </div>
                     <div class="stat-item">
-                        <div class="text-4xl font-black gradient-text">∞</div>
+                        <div class="text-4xl md:text-5xl font-black gradient-text">∞</div>
                         <div class="text-gray-400 text-sm mt-2">Unlimited Screens</div>
                     </div>
                     <div class="stat-item">
-                        <div class="text-4xl font-black gradient-text">24/7</div>
+                        <div class="text-4xl md:text-5xl font-black gradient-text">24/7</div>
                         <div class="text-gray-400 text-sm mt-2">Always Online</div>
                     </div>
                 </div>
@@ -133,132 +149,132 @@
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="py-20 bg-gray-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Features Section - Full Width -->
+    <section id="features" class="full-width-section py-20 bg-gray-900">
+        <div class="w-full px-6 lg:px-12">
             <div class="text-center mb-16 section-header">
-                <h2 class="text-5xl font-black mb-4">Powerful Features</h2>
-                <p class="text-xl text-gray-400">Everything you need to manage digital signage</p>
+                <h2 class="text-4xl sm:text-5xl font-black mb-4">Powerful Features</h2>
+                <p class="text-lg sm:text-xl text-gray-400">Everything you need to manage digital signage</p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-7xl mx-auto">
                 <!-- Feature 1 -->
-                <div class="feature-card p-8 rounded-2xl border border-gray-700 hover:border-dsp-blue transition transform hover:-translate-y-2">
-                    <div class="text-5xl mb-4">📺</div>
-                    <h3 class="text-2xl font-bold mb-3">Screen Management</h3>
-                    <p class="text-gray-400">Create and manage unlimited screens with unique device keys. Monitor status in real-time.</p>
+                <div class="feature-card p-6 lg:p-8 rounded-2xl border border-gray-700 hover:border-dsp-blue transition transform hover:-translate-y-2">
+                    <div class="text-4xl lg:text-5xl mb-4">📺</div>
+                    <h3 class="text-xl lg:text-2xl font-bold mb-3">Screen Management</h3>
+                    <p class="text-gray-400 text-sm lg:text-base">Create and manage unlimited screens with unique device keys. Monitor status in real-time.</p>
                 </div>
                 
                 <!-- Feature 2 -->
-                <div class="feature-card p-8 rounded-2xl border border-gray-700 hover:border-dsp-green transition transform hover:-translate-y-2">
-                    <div class="text-5xl mb-4">🎨</div>
-                    <h3 class="text-2xl font-bold mb-3">Content Library</h3>
-                    <p class="text-gray-400">Upload images and videos. Organize your media in one central location.</p>
+                <div class="feature-card p-6 lg:p-8 rounded-2xl border border-gray-700 hover:border-dsp-green transition transform hover:-translate-y-2">
+                    <div class="text-4xl lg:text-5xl mb-4">🎨</div>
+                    <h3 class="text-xl lg:text-2xl font-bold mb-3">Content Library</h3>
+                    <p class="text-gray-400 text-sm lg:text-base">Upload images and videos. Organize your media in one central location.</p>
                 </div>
                 
                 <!-- Feature 3 -->
-                <div class="feature-card p-8 rounded-2xl border border-gray-700 hover:border-dsp-red transition transform hover:-translate-y-2">
-                    <div class="text-5xl mb-4">📋</div>
-                    <h3 class="text-2xl font-bold mb-3">Smart Playlists</h3>
-                    <p class="text-gray-400">Create dynamic playlists with drag-and-drop. Set custom durations and transitions.</p>
+                <div class="feature-card p-6 lg:p-8 rounded-2xl border border-gray-700 hover:border-dsp-red transition transform hover:-translate-y-2">
+                    <div class="text-4xl lg:text-5xl mb-4">📋</div>
+                    <h3 class="text-xl lg:text-2xl font-bold mb-3">Smart Playlists</h3>
+                    <p class="text-gray-400 text-sm lg:text-base">Create dynamic playlists with drag-and-drop. Set custom durations and transitions.</p>
                 </div>
                 
                 <!-- Feature 4 -->
-                <div class="feature-card p-8 rounded-2xl border border-gray-700 hover:border-dsp-blue transition transform hover:-translate-y-2">
-                    <div class="text-5xl mb-4">⏰</div>
-                    <h3 class="text-2xl font-bold mb-3">Scheduling</h3>
-                    <p class="text-gray-400">Automate content changes based on time and date. Perfect for time-sensitive campaigns.</p>
+                <div class="feature-card p-6 lg:p-8 rounded-2xl border border-gray-700 hover:border-dsp-blue transition transform hover:-translate-y-2">
+                    <div class="text-4xl lg:text-5xl mb-4">⏰</div>
+                    <h3 class="text-xl lg:text-2xl font-bold mb-3">Scheduling</h3>
+                    <p class="text-gray-400 text-sm lg:text-base">Automate content changes based on time and date. Perfect for time-sensitive campaigns.</p>
                 </div>
                 
                 <!-- Feature 5 -->
-                <div class="feature-card p-8 rounded-2xl border border-gray-700 hover:border-dsp-green transition transform hover:-translate-y-2">
-                    <div class="text-5xl mb-4">🔗</div>
-                    <h3 class="text-2xl font-bold mb-3">Easy Sharing</h3>
-                    <p class="text-gray-400">Generate public links to share playlists. Display on any device with a browser.</p>
+                <div class="feature-card p-6 lg:p-8 rounded-2xl border border-gray-700 hover:border-dsp-green transition transform hover:-translate-y-2">
+                    <div class="text-4xl lg:text-5xl mb-4">🔗</div>
+                    <h3 class="text-xl lg:text-2xl font-bold mb-3">Easy Sharing</h3>
+                    <p class="text-gray-400 text-sm lg:text-base">Generate public links to share playlists. Display on any device with a browser.</p>
                 </div>
                 
                 <!-- Feature 6 -->
-                <div class="feature-card p-8 rounded-2xl border border-gray-700 hover:border-dsp-red transition transform hover:-translate-y-2">
-                    <div class="text-5xl mb-4">📊</div>
-                    <h3 class="text-2xl font-bold mb-3">Analytics Dashboard</h3>
-                    <p class="text-gray-400">Track screen status, content performance, and system health at a glance.</p>
+                <div class="feature-card p-6 lg:p-8 rounded-2xl border border-gray-700 hover:border-dsp-red transition transform hover:-translate-y-2">
+                    <div class="text-4xl lg:text-5xl mb-4">📊</div>
+                    <h3 class="text-xl lg:text-2xl font-bold mb-3">Analytics Dashboard</h3>
+                    <p class="text-gray-400 text-sm lg:text-base">Track screen status, content performance, and system health at a glance.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- How It Works -->
-    <section class="py-20 bg-black">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- How It Works - Full Width -->
+    <section class="full-width-section py-20 bg-black">
+        <div class="w-full px-6 lg:px-12">
             <div class="text-center mb-16 section-header">
-                <h2 class="text-5xl font-black mb-4">How It Works</h2>
-                <p class="text-xl text-gray-400">Get started in 3 simple steps</p>
+                <h2 class="text-4xl sm:text-5xl font-black mb-4">How It Works</h2>
+                <p class="text-lg sm:text-xl text-gray-400">Get started in 3 simple steps</p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 max-w-6xl mx-auto">
                 <div class="text-center step-item">
                     <div class="w-20 h-20 bg-gradient-to-br from-dsp-blue to-blue-600 rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6">1</div>
-                    <h3 class="text-2xl font-bold mb-3">Upload Content</h3>
-                    <p class="text-gray-400">Add your images and videos to the content library</p>
+                    <h3 class="text-xl lg:text-2xl font-bold mb-3">Upload Content</h3>
+                    <p class="text-gray-400 text-sm lg:text-base">Add your images and videos to the content library</p>
                 </div>
                 
                 <div class="text-center step-item">
                     <div class="w-20 h-20 bg-gradient-to-br from-dsp-green to-green-600 rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6">2</div>
-                    <h3 class="text-2xl font-bold mb-3">Create Playlists</h3>
-                    <p class="text-gray-400">Organize content into playlists with custom timing</p>
+                    <h3 class="text-xl lg:text-2xl font-bold mb-3">Create Playlists</h3>
+                    <p class="text-gray-400 text-sm lg:text-base">Organize content into playlists with custom timing</p>
                 </div>
                 
                 <div class="text-center step-item">
                     <div class="w-20 h-20 bg-gradient-to-br from-dsp-red to-red-600 rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-6">3</div>
-                    <h3 class="text-2xl font-bold mb-3">Display Anywhere</h3>
-                    <p class="text-gray-400">Show your content on any screen with a web browser</p>
+                    <h3 class="text-xl lg:text-2xl font-bold mb-3">Display Anywhere</h3>
+                    <p class="text-gray-400 text-sm lg:text-base">Show your content on any screen with a web browser</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Pricing Section -->
-    <section class="py-20 bg-gray-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Pricing Section - Full Width -->
+    <section class="full-width-section py-20 bg-gray-900">
+        <div class="w-full px-6 lg:px-12">
             <div class="text-center mb-16 section-header">
-                <h2 class="text-5xl font-black mb-4">Simple Pricing</h2>
-                <p class="text-xl text-gray-400">Start free, upgrade when you're ready</p>
+                <h2 class="text-4xl sm:text-5xl font-black mb-4">Simple Pricing</h2>
+                <p class="text-lg sm:text-xl text-gray-400">Start free, upgrade when you're ready</p>
             </div>
             
             <div class="max-w-lg mx-auto">
-                <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-10 rounded-3xl border-2 border-dsp-blue shadow-2xl pricing-card">
+                <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-8 lg:p-10 rounded-3xl border-2 border-dsp-blue shadow-2xl pricing-card">
                     <div class="text-center mb-8">
-                        <div class="text-6xl font-black gradient-text mb-4">FREE</div>
-                        <p class="text-gray-400 text-lg">Currently in beta</p>
+                        <div class="text-5xl lg:text-6xl font-black gradient-text mb-4">FREE</div>
+                        <p class="text-gray-400 text-base lg:text-lg">Currently in beta</p>
                     </div>
                     
                     <ul class="space-y-4 mb-8">
-                        <li class="flex items-center text-gray-300">
-                            <svg class="w-6 h-6 text-dsp-green mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <li class="flex items-center text-gray-300 text-sm lg:text-base">
+                            <svg class="w-6 h-6 text-dsp-green mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
                             Unlimited screens
                         </li>
-                        <li class="flex items-center text-gray-300">
-                            <svg class="w-6 h-6 text-dsp-green mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <li class="flex items-center text-gray-300 text-sm lg:text-base">
+                            <svg class="w-6 h-6 text-dsp-green mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
                             Unlimited content
                         </li>
-                        <li class="flex items-center text-gray-300">
-                            <svg class="w-6 h-6 text-dsp-green mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <li class="flex items-center text-gray-300 text-sm lg:text-base">
+                            <svg class="w-6 h-6 text-dsp-green mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
                             Unlimited playlists
                         </li>
-                        <li class="flex items-center text-gray-300">
-                            <svg class="w-6 h-6 text-dsp-green mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <li class="flex items-center text-gray-300 text-sm lg:text-base">
+                            <svg class="w-6 h-6 text-dsp-green mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
                             Scheduling features
                         </li>
-                        <li class="flex items-center text-gray-300">
-                            <svg class="w-6 h-6 text-dsp-green mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <li class="flex items-center text-gray-300 text-sm lg:text-base">
+                            <svg class="w-6 h-6 text-dsp-green mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
                             Public sharing links
@@ -273,20 +289,22 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="py-20 bg-black">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center cta-section">
-            <h2 class="text-5xl md:text-6xl font-black mb-6">Ready to Get Started?</h2>
-            <p class="text-xl text-gray-400 mb-12">Join now and transform your digital signage experience</p>
-            <a href="?page=register" class="inline-block bg-gradient-to-r from-dsp-blue to-blue-600 text-white px-12 py-5 rounded-xl font-bold text-xl hover:from-blue-600 hover:to-blue-700 transition shadow-2xl transform hover:scale-105">
-                Create Free Account
-            </a>
+    <!-- CTA Section - Full Width -->
+    <section class="full-width-section py-20 bg-black">
+        <div class="w-full px-6 lg:px-12 text-center cta-section">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-4xl sm:text-5xl md:text-6xl font-black mb-6">Ready to Get Started?</h2>
+                <p class="text-lg sm:text-xl text-gray-400 mb-12">Join now and transform your digital signage experience</p>
+                <a href="?page=register" class="inline-block bg-gradient-to-r from-dsp-blue to-blue-600 text-white px-12 py-5 rounded-xl font-bold text-xl hover:from-blue-600 hover:to-blue-700 transition shadow-2xl transform hover:scale-105">
+                    Create Free Account
+                </a>
+            </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 border-t-4 rgb-border py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Footer - Full Width -->
+    <footer class="full-width-section bg-gray-900 border-t-4 rgb-border py-8">
+        <div class="w-full px-6 lg:px-12">
             <p class="text-center text-gray-400 text-sm">&copy; <?php echo date('Y'); ?> Digital Signage Platform. All rights reserved.</p>
         </div>
     </footer>
