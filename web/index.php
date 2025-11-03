@@ -81,6 +81,9 @@ switch ($page) {
     case 'settings':
         include __DIR__ . '/pages/settings.php';
         break;
+    case 'getting-started':
+        include __DIR__ . '/pages/getting-started.php';
+        break;
     case 'home':
     default:
         if ($isLoggedIn) {
