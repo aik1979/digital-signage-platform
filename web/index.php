@@ -97,10 +97,12 @@ switch ($page) {
     default:
         if ($isLoggedIn) {
             header('Location: ?page=dashboard');
+            exit;
         } else {
-            header('Location: ?page=login');
+            // Show landing page for non-logged-in users
+            include __DIR__ . '/landing.php';
+            exit;
         }
-        exit;
 }
 
 // Include footer
