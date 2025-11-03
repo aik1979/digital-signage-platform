@@ -257,9 +257,23 @@ if (isset($_GET['edit'])) {
             
             <div class="playlist-actions">
                 <?php if ($playlist['share_enabled'] && $playlist['share_token']): ?>
-                <a href="view/<?php echo $playlist['share_token']; ?>" target="_blank" class="btn btn-secondary btn-sm" title="View in browser">
-                    🌐 View
-                </a>
+                <?php 
+                // Get short URL if exists
+                $shortUrl = $db->fetchOne(
+                    "SELECT short_code FROM short_urls WHERE playlist_id = ? AND is_active = 1",
+                    [$playlist['id']]
+                );
+                $shareUrl = $shortUrl ? rtrim(APP_URL, '/') . '/s/' . $shortUrl['short_code'] : rtrim(APP_URL, '/') . '/view/' . $playlist['share_token'];
+                ?>
+                <div class="dropdown">
+                    <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" onclick="toggleDropdown(<?php echo $playlist['id']; ?>)">
+                        🌐 View ▼
+                    </button>
+                    <div class="dropdown-menu" id="dropdown-<?php echo $playlist['id']; ?>">
+                        <a href="<?php echo $shareUrl; ?>" target="_blank" class="dropdown-item">🔗 Open in New Tab</a>
+                        <button type="button" class="dropdown-item" onclick="copyToClipboard('<?php echo $shareUrl; ?>', event)">📋 Copy Short URL</button>
+                    </div>
+                </div>
                 <?php else: ?>
                 <button type="button" class="btn btn-secondary btn-sm" disabled title="Enable sharing in playlist settings">
                     🌐 View
@@ -689,6 +703,43 @@ function toggleModal(modalId) {
     } else {
         modal.style.display = 'none';
     }
+}
+
+function toggleDropdown(playlistId) {
+    const dropdown = document.getElementById('dropdown-' + playlistId);
+    const allDropdowns = document.querySelectorAll('.dropdown-menu');
+    
+    // Close all other dropdowns
+    allDropdowns.forEach(d => {
+        if (d !== dropdown) d.classList.remove('show');
+    });
+    
+    dropdown.classList.toggle('show');
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.matches('.dropdown-toggle')) {
+        const dropdowns = document.querySelectorAll('.dropdown-menu');
+        dropdowns.forEach(d => d.classList.remove('show'));
+    }
+});
+
+function copyToClipboard(text, event) {
+    event.stopPropagation();
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Short URL copied to clipboard!');
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('Short URL copied to clipboard!');
+    });
 }
 
 function confirmDelete(playlistId, playlistName) {
