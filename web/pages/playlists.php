@@ -212,566 +212,393 @@ if (isset($_GET['edit'])) {
 }
 ?>
 
-<div class="page-header">
-    <div class="header-content">
+
+<div class="space-y-8">
+    <!-- Page Header -->
+    <div class="flex items-center justify-between">
         <div>
-            <h1>Playlists</h1>
-            <p>Create and manage content playlists</p>
+            <h1 class="text-3xl font-bold text-white mb-2">Playlists</h1>
+            <p class="text-gray-400">Create and manage content playlists</p>
         </div>
-        <button type="button" class="btn btn-primary" onclick="toggleModal('createPlaylistModal')">
+        <button type="button" class="bg-gradient-to-r from-dsp-blue to-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:from-blue-600 hover:to-blue-700 transition transform hover:scale-105 shadow-lg" onclick="toggleModal('createPlaylistModal')">
             ➕ Create Playlist
         </button>
     </div>
-</div>
 
-<?php if (!$editPlaylist): ?>
     <?php if (empty($playlists)): ?>
-    <div class="empty-state">
-        <h2>📋 No Playlists Yet</h2>
-        <p>Create a playlist to organize your content for display on screens.</p>
-        <button type="button" class="btn btn-primary" onclick="toggleModal('createPlaylistModal')">
+    <!-- Empty State -->
+    <div class="bg-gray-800 border border-gray-700 rounded-lg p-12 text-center">
+        <div class="text-6xl mb-4">📋</div>
+        <h2 class="text-2xl font-bold text-white mb-2">No Playlists Yet</h2>
+        <p class="text-gray-400 mb-6">Create your first playlist to organize content for your screens.</p>
+        <button type="button" class="bg-gradient-to-r from-dsp-blue to-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:from-blue-600 hover:to-blue-700 transition transform hover:scale-105 shadow-lg" onclick="toggleModal('createPlaylistModal')">
             Create Your First Playlist
         </button>
     </div>
     <?php else: ?>
-    <div class="playlists-grid">
+    <!-- Playlists Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <?php foreach ($playlists as $playlist): ?>
-        <div class="playlist-card">
-            <div class="playlist-header">
-                <h3><?php echo sanitize($playlist['name']); ?></h3>
+        <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex-1">
+                    <h3 class="text-xl font-bold text-white mb-1"><?php echo sanitize($playlist['name']); ?></h3>
+                    <?php if ($playlist['description']): ?>
+                    <p class="text-gray-400 text-sm"><?php echo sanitize($playlist['description']); ?></p>
+                    <?php endif; ?>
+                </div>
                 <?php if ($playlist['is_default']): ?>
-                    <span class="badge badge-success">Default</span>
+                <span class="inline-block bg-green-600 text-white text-xs px-2 py-1 rounded ml-2">Default</span>
                 <?php endif; ?>
             </div>
             
-            <div class="playlist-info">
-                <?php if ($playlist['description']): ?>
-                <p class="playlist-description"><?php echo sanitize($playlist['description']); ?></p>
-                <?php endif; ?>
-                
-                <div class="playlist-stats">
-                    <span>📦 <?php echo $playlist['item_count']; ?> items</span>
-                    <span>📺 <?php echo $playlist['screen_count']; ?> screens</span>
+            <div class="space-y-2 mb-4 text-sm">
+                <div class="flex justify-between text-gray-400">
+                    <span>Items:</span>
+                    <span class="text-white"><?php echo $playlist['item_count']; ?></span>
                 </div>
+                <div class="flex justify-between text-gray-400">
+                    <span>Transition:</span>
+                    <span class="text-white"><?php echo ucfirst($playlist['transition']); ?></span>
+                </div>
+                <?php if ($playlist['share_enabled']): ?>
+                <div class="flex justify-between text-gray-400">
+                    <span>Sharing:</span>
+                    <span class="text-green-400">✓ Enabled</span>
+                </div>
+                <?php endif; ?>
             </div>
             
-            <div class="playlist-actions">
-                <?php if ($playlist['share_enabled'] && $playlist['share_token']): ?>
-                <?php 
-                // Get short URL if exists
-                $shortUrl = $db->fetchOne(
-                    "SELECT short_code FROM short_urls WHERE playlist_id = ? AND is_active = 1",
-                    [$playlist['id']]
-                );
-                $shareUrl = $shortUrl ? rtrim(APP_URL, '/') . '/s/' . $shortUrl['short_code'] : rtrim(APP_URL, '/') . '/view/' . $playlist['share_token'];
-                ?>
-                <div class="dropdown">
-                    <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" onclick="toggleDropdown(<?php echo $playlist['id']; ?>)">
-                        🌐 View ▼
-                    </button>
-                    <div class="dropdown-menu" id="dropdown-<?php echo $playlist['id']; ?>">
-                        <a href="<?php echo $shareUrl; ?>" target="_blank" class="dropdown-item">🔗 Open in New Tab</a>
-                        <button type="button" class="dropdown-item" onclick="copyToClipboard('<?php echo $shareUrl; ?>', event)">📋 Copy Short URL</button>
-                    </div>
-                </div>
-                <?php else: ?>
-                <button type="button" class="btn btn-secondary btn-sm" disabled title="Enable sharing in playlist settings">
-                    🌐 View
-                </button>
-                <?php endif; ?>
-                <a href="?page=playlists&edit=<?php echo $playlist['id']; ?>" class="btn btn-primary btn-sm">
+            <div class="grid grid-cols-2 gap-2">
+                <a href="?page=playlists&edit=<?php echo $playlist['id']; ?>" class="bg-dsp-blue text-white text-center font-semibold py-2 px-3 text-sm rounded-md hover:bg-blue-600 transition">
                     ✏️ Edit
                 </a>
-                <button type="button" class="btn btn-danger btn-sm" 
-                        onclick="confirmDelete(<?php echo $playlist['id']; ?>, '<?php echo addslashes($playlist['name']); ?>')">
+                <?php if ($playlist['share_enabled']): ?>
+                <button type="button" class="bg-gray-700 text-white font-semibold py-2 px-3 text-sm rounded-md hover:bg-gray-600 transition" onclick="showShareLink(<?php echo $playlist['id']; ?>)">
+                    🔗 Share
+                </button>
+                <?php else: ?>
+                <button type="button" class="bg-gradient-to-r from-dsp-red to-red-600 text-white font-semibold py-2 px-3 text-sm rounded-md hover:from-red-600 hover:to-red-700 transition" onclick="confirmDelete(<?php echo $playlist['id']; ?>, '<?php echo addslashes($playlist['name']); ?>')">
                     🗑️ Delete
                 </button>
+                <?php endif; ?>
             </div>
         </div>
         <?php endforeach; ?>
     </div>
     <?php endif; ?>
+</div>
 
-<?php else: ?>
-    <!-- Playlist Editor -->
-    <div class="playlist-editor">
-        <div class="editor-header">
-            <div>
-                <h2><?php echo sanitize($editPlaylist['name']); ?></h2>
-                <p><?php echo sanitize($editPlaylist['description'] ?: 'No description'); ?></p>
-            </div>
-            <div class="editor-actions">
-                <button type="button" class="btn btn-secondary" onclick="toggleModal('editPlaylistModal')">
-                    ⚙️ Settings
-                </button>
-                <a href="?page=playlists" class="btn btn-secondary">← Back to Playlists</a>
-            </div>
+<?php if ($editPlaylist): ?>
+<!-- Playlist Editor -->
+<div class="mt-8 space-y-6">
+    <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-white">Edit: <?php echo sanitize($editPlaylist['name']); ?></h2>
+            <a href="?page=playlists" class="text-gray-400 hover:text-white">✕ Close Editor</a>
         </div>
         
-        <div class="editor-content">
-            <!-- Available Content -->
-            <div class="content-library-panel">
-                <h3>Available Content</h3>
-                <div id="availableContent" class="content-list">
-                    <?php if (empty($availableContent)): ?>
-                        <p class="empty-message">All content has been added to this playlist.</p>
-                    <?php else: ?>
-                        <?php foreach ($availableContent as $content): ?>
-                        <div class="content-item" data-content-id="<?php echo $content['id']; ?>" 
-                             data-title="<?php echo htmlspecialchars($content['title']); ?>"
-                             data-duration="<?php echo $content['duration']; ?>"
-                             data-type="<?php echo $content['file_type']; ?>"
-                             data-thumbnail="<?php echo $content['thumbnail_path'] ?: $content['file_path']; ?>">
-                            <div class="content-thumbnail">
-                                <?php if ($content['file_type'] === 'image'): ?>
-                                    <img src="<?php echo $content['thumbnail_path'] ?: $content['file_path']; ?>" 
-                                         alt="<?php echo sanitize($content['title']); ?>">
-                                <?php else: ?>
-                                    <div class="video-thumb">🎥</div>
-                                <?php endif; ?>
-                            </div>
-                            <div class="content-details">
-                                <strong><?php echo sanitize($content['title']); ?></strong>
-                                <span><?php echo $content['duration']; ?>s</span>
-                            </div>
-                            <button type="button" class="btn-add" onclick="addToPlaylist(this.parentElement)">+</button>
-                        </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+        <form method="POST" action="?page=playlists" class="space-y-4">
+            <input type="hidden" name="action" value="update_playlist">
+            <input type="hidden" name="playlist_id" value="<?php echo $editPlaylist['id']; ?>">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Playlist Name *</label>
+                    <input type="text" id="name" name="name" required 
+                           value="<?php echo sanitize($editPlaylist['name']); ?>"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
+                </div>
+                
+                <div>
+                    <label for="transition" class="block text-sm font-medium text-gray-300 mb-2">Transition Effect</label>
+                    <select id="transition" name="transition" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
+                        <option value="fade" <?php echo $editPlaylist['transition'] === 'fade' ? 'selected' : ''; ?>>Fade</option>
+                        <option value="slide" <?php echo $editPlaylist['transition'] === 'slide' ? 'selected' : ''; ?>>Slide</option>
+                        <option value="zoom" <?php echo $editPlaylist['transition'] === 'zoom' ? 'selected' : ''; ?>>Zoom</option>
+                        <option value="none" <?php echo $editPlaylist['transition'] === 'none' ? 'selected' : ''; ?>>None</option>
+                    </select>
                 </div>
             </div>
             
-            <!-- Playlist Items -->
-            <div class="playlist-panel">
-                <h3>Playlist Items (Drag to Reorder)</h3>
-                <div id="playlistItems" class="playlist-items">
-                    <?php if (empty($playlistItems)): ?>
-                        <p class="empty-message">No items in this playlist. Add content from the left.</p>
-                    <?php else: ?>
-                        <?php foreach ($playlistItems as $item): ?>
-                        <div class="playlist-item" draggable="true" 
-                             data-content-id="<?php echo $item['content_id']; ?>"
-                             data-type="<?php echo $item['file_type']; ?>"
-                             data-duration="<?php echo $item['duration_override'] ?: $item['default_duration']; ?>">
-                            <div class="drag-handle">⋮⋮</div>
-                            <div class="item-thumbnail">
-                                <?php if ($item['file_type'] === 'image'): ?>
-                                    <img src="<?php echo $item['thumbnail_path'] ?: $item['file_path']; ?>" 
-                                         alt="<?php echo sanitize($item['title']); ?>">
-                                <?php else: ?>
-                                    <div class="video-thumb">🎥</div>
-                                <?php endif; ?>
-                            </div>
-                            <div class="item-details">
-                                <strong><?php echo sanitize($item['title']); ?></strong>
-                                <?php if ($item['file_type'] === 'image'): ?>
-                                    <input type="number" class="duration-input" 
-                                           value="<?php echo $item['duration_override'] ?: $item['default_duration']; ?>" 
-                                           min="1" max="300" placeholder="Duration (s)">
-                                <?php else: ?>
-                                    <span class="video-duration">⏱️ <?php echo $item['default_duration']; ?>s (auto)</span>
-                                <?php endif; ?>
-                            </div>
-                            <button type="button" class="btn-remove" onclick="removeFromPlaylist(this.parentElement)">×</button>
-                        </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-300 mb-2">Description</label>
+                <textarea id="description" name="description" rows="2"
+                          class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition"><?php echo sanitize($editPlaylist['description'] ?? ''); ?></textarea>
+            </div>
+            
+            <div class="flex items-center space-x-6">
+                <label class="flex items-center">
+                    <input type="checkbox" name="is_default" <?php echo $editPlaylist['is_default'] ? 'checked' : ''; ?> class="w-4 h-4 text-dsp-blue bg-gray-700 border-gray-600 rounded focus:ring-dsp-blue focus:ring-2">
+                    <span class="ml-2 text-sm text-gray-300">Set as default playlist</span>
+                </label>
                 
-                <div class="playlist-save">
-                    <button type="button" class="btn btn-primary btn-block" onclick="savePlaylist()">
-                        💾 Save Playlist
+                <label class="flex items-center">
+                    <input type="checkbox" name="share_enabled" <?php echo $editPlaylist['share_enabled'] ? 'checked' : ''; ?> class="w-4 h-4 text-dsp-blue bg-gray-700 border-gray-600 rounded focus:ring-dsp-blue focus:ring-2">
+                    <span class="ml-2 text-sm text-gray-300">Enable public sharing</span>
+                </label>
+            </div>
+            
+            <div class="flex justify-end">
+                <button type="submit" class="bg-gradient-to-r from-dsp-blue to-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:from-blue-600 hover:to-blue-700 transition shadow-lg">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Playlist Content Editor -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Current Playlist Items -->
+        <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
+            <h3 class="text-xl font-bold text-white mb-4">Playlist Items (<?php echo count($playlistItems); ?>)</h3>
+            
+            <?php if (empty($playlistItems)): ?>
+            <div class="text-center py-8 text-gray-400">
+                <p>No items in this playlist yet.</p>
+                <p class="text-sm mt-2">Drag content from the right to add items.</p>
+            </div>
+            <?php else: ?>
+            <div id="playlistItems" class="space-y-2">
+                <?php foreach ($playlistItems as $item): ?>
+                <div class="bg-gray-700 border border-gray-600 rounded-lg p-3 flex items-center space-x-3 cursor-move hover:bg-gray-600 transition" data-id="<?php echo $item['id']; ?>">
+                    <div class="text-gray-400">☰</div>
+                    <div class="w-12 h-12 bg-gray-900 rounded overflow-hidden flex-shrink-0">
+                        <?php if ($item['file_type'] === 'image'): ?>
+                            <img src="<?php echo $item['thumbnail_path'] ?: $item['file_path']; ?>" alt="" class="w-full h-full object-cover">
+                        <?php else: ?>
+                            <div class="w-full h-full flex items-center justify-center text-xl">🎥</div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-white font-medium truncate"><?php echo sanitize($item['title']); ?></p>
+                        <p class="text-xs text-gray-400"><?php echo $item['duration']; ?>s • <?php echo ucfirst($item['file_type']); ?></p>
+                    </div>
+                    <button type="button" class="text-red-400 hover:text-red-300" onclick="removeFromPlaylist(<?php echo $item['playlist_item_id']; ?>)">
+                        ✕
                     </button>
                 </div>
+                <?php endforeach; ?>
             </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Available Content -->
+        <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
+            <h3 class="text-xl font-bold text-white mb-4">Available Content</h3>
+            
+            <?php if (empty($availableContent)): ?>
+            <div class="text-center py-8 text-gray-400">
+                <p>No available content.</p>
+                <p class="text-sm mt-2">Upload content first to add to playlists.</p>
+            </div>
+            <?php else: ?>
+            <div class="space-y-2 max-h-96 overflow-y-auto">
+                <?php foreach ($availableContent as $content): ?>
+                <div class="bg-gray-700 border border-gray-600 rounded-lg p-3 flex items-center space-x-3 hover:bg-gray-600 transition cursor-pointer" onclick="addToPlaylist(<?php echo $content['id']; ?>)">
+                    <div class="w-12 h-12 bg-gray-900 rounded overflow-hidden flex-shrink-0">
+                        <?php if ($content['file_type'] === 'image'): ?>
+                            <img src="<?php echo $content['thumbnail_path'] ?: $content['file_path']; ?>" alt="" class="w-full h-full object-cover">
+                        <?php else: ?>
+                            <div class="w-full h-full flex items-center justify-center text-xl">🎥</div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-white font-medium truncate"><?php echo sanitize($content['title']); ?></p>
+                        <p class="text-xs text-gray-400"><?php echo $content['duration']; ?>s • <?php echo ucfirst($content['file_type']); ?></p>
+                    </div>
+                    <div class="text-dsp-blue">+</div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
-    
-    <!-- Edit Playlist Settings Modal -->
-    <div id="editPlaylistModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Playlist Settings</h2>
-                <button type="button" class="close-btn" onclick="toggleModal('editPlaylistModal')">&times;</button>
-            </div>
-            <form method="POST" action="?page=playlists">
-                <input type="hidden" name="action" value="update_playlist">
-                <input type="hidden" name="playlist_id" value="<?php echo $editPlaylist['id']; ?>">
-                
-                <div class="form-group">
-                    <label for="edit_name">Playlist Name *</label>
-                    <input type="text" id="edit_name" name="name" required 
-                           value="<?php echo sanitize($editPlaylist['name']); ?>">
-                </div>
-                
-                <div class="form-group">
-                    <label for="edit_description">Description</label>
-                    <textarea id="edit_description" name="description" rows="3"><?php echo sanitize($editPlaylist['description'] ?? ''); ?></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="edit_transition">Transition Effect</label>
-                    <select id="edit_transition" name="transition">
-                        <option value="fade" <?php echo ($editPlaylist['transition'] ?? 'fade') === 'fade' ? 'selected' : ''; ?>>Fade</option>
-                        <option value="slide" <?php echo ($editPlaylist['transition'] ?? '') === 'slide' ? 'selected' : ''; ?>>Slide</option>
-                        <option value="zoom" <?php echo ($editPlaylist['transition'] ?? '') === 'zoom' ? 'selected' : ''; ?>>Zoom</option>
-                        <option value="none" <?php echo ($editPlaylist['transition'] ?? '') === 'none' ? 'selected' : ''; ?>>None (Instant)</option>
-                    </select>
-                    <small>Animation between content items</small>
-                </div>
-                
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" name="share_enabled" <?php echo ($editPlaylist['share_enabled'] ?? 0) ? 'checked' : ''; ?>>
-                        Enable public sharing (browser-based viewing)
-                    </label>
-                </div>
-                
-                <?php if ($editPlaylist['share_token']): ?>
-                <?php 
-                // Get short URL if exists
-                $shortUrl = $db->fetchOne(
-                    "SELECT short_code FROM short_urls WHERE playlist_id = ? AND user_id = ? AND is_active = 1",
-                    [$editPlaylist['id'], $userId]
-                );
-                ?>
-                <div class="form-group">
-                    <label>Share URL</label>
-                    <?php if ($shortUrl): ?>
-                    <div class="key-box">
-                        <code id="shareUrl" onclick="copyShareUrl()" style="cursor: pointer;" title="Click to copy"><?php echo rtrim(APP_URL, '/'); ?>/s/<?php echo $shortUrl['short_code']; ?></code>
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="copyShareUrl()">📋 Copy</button>
-                    </div>
-                    <small>Short URL - Click to copy (<?php echo $shortUrl['clicks'] ?? 0; ?> views)</small>
-                    <?php else: ?>
-                    <div class="key-box">
-                        <code id="shareUrl" onclick="copyShareUrl()" style="cursor: pointer;" title="Click to copy"><?php echo APP_URL; ?>view/<?php echo $editPlaylist['share_token']; ?></code>
-                        <button type="button" class="btn btn-secondary btn-sm" onclick="copyShareUrl()">📋 Copy</button>
-                    </div>
-                    <small>Click URL to copy - Enable sharing and save to generate short URL</small>
-                    <?php endif; ?>
-                </div>
-                <?php endif; ?>
-                
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" name="is_default" <?php echo $editPlaylist['is_default'] ? 'checked' : ''; ?>>
-                        Set as default playlist (fallback for screens)
-                    </label>
-                </div>
-                
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="toggleModal('editPlaylistModal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Update Playlist</button>
-                </div>
-            </form>
-        </div>
-    </div>
+</div>
 <?php endif; ?>
 
+
 <!-- Create Playlist Modal -->
-<div id="createPlaylistModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Create New Playlist</h2>
-            <button type="button" class="close-btn" onclick="toggleModal('createPlaylistModal')">&times;</button>
+<div id="createPlaylistModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display: none;">
+    <div class="bg-gray-800 rounded-lg shadow-2xl max-w-2xl w-full mx-4 border border-gray-700">
+        <div class="flex items-center justify-between p-6 border-b border-gray-700">
+            <h2 class="text-2xl font-bold text-white">Create New Playlist</h2>
+            <button type="button" class="text-gray-400 hover:text-white text-3xl leading-none" onclick="toggleModal('createPlaylistModal')">&times;</button>
         </div>
         <form method="POST" action="?page=playlists">
-            <input type="hidden" name="action" value="create_playlist">
-            
-            <div class="form-group">
-                <label for="name">Playlist Name *</label>
-                <input type="text" id="name" name="name" required 
-                       placeholder="e.g., Breakfast Menu, Lunch Specials">
+            <div class="p-6 space-y-4">
+                <input type="hidden" name="action" value="create_playlist">
+                
+                <div>
+                    <label for="create_name" class="block text-sm font-medium text-gray-300 mb-2">Playlist Name *</label>
+                    <input type="text" id="create_name" name="name" required 
+                           placeholder="e.g., Main Menu, Breakfast Specials"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
+                </div>
+                
+                <div>
+                    <label for="create_description" class="block text-sm font-medium text-gray-300 mb-2">Description</label>
+                    <textarea id="create_description" name="description" rows="2"
+                              placeholder="Optional description..."
+                              class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition"></textarea>
+                </div>
+                
+                <div>
+                    <label for="create_transition" class="block text-sm font-medium text-gray-300 mb-2">Transition Effect</label>
+                    <select id="create_transition" name="transition" class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
+                        <option value="fade">Fade</option>
+                        <option value="slide">Slide</option>
+                        <option value="zoom">Zoom</option>
+                        <option value="none">None</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="flex items-center">
+                        <input type="checkbox" name="is_default" class="w-4 h-4 text-dsp-blue bg-gray-700 border-gray-600 rounded focus:ring-dsp-blue focus:ring-2">
+                        <span class="ml-2 text-sm text-gray-300">Set as default playlist</span>
+                    </label>
+                </div>
             </div>
             
-            <div class="form-group">
-                <label for="description">Description (Optional)</label>
-                <textarea id="description" name="description" rows="3" 
-                          placeholder="Brief description of this playlist..."></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="transition">Transition Effect</label>
-                <select id="transition" name="transition">
-                    <option value="fade">Fade</option>
-                    <option value="slide">Slide</option>
-                    <option value="zoom">Zoom</option>
-                    <option value="none">None (Instant)</option>
-                </select>
-                <small>Animation between content items</small>
-            </div>
-            
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" name="is_default">
-                    Set as default playlist
-                </label>
-                <small>Default playlist is used when no schedule is active</small>
-            </div>
-            
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="toggleModal('createPlaylistModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">Create Playlist</button>
+            <div class="flex justify-end space-x-3 p-6 border-t border-gray-700 bg-gray-900">
+                <button type="button" class="bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg hover:bg-gray-600 transition" onclick="toggleModal('createPlaylistModal')">Cancel</button>
+                <button type="submit" class="bg-gradient-to-r from-dsp-blue to-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:from-blue-600 hover:to-blue-700 transition shadow-lg">Create Playlist</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Delete Form -->
+<!-- Share Link Modal -->
+<div id="shareLinkModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display: none;">
+    <div class="bg-gray-800 rounded-lg shadow-2xl max-w-2xl w-full mx-4 border border-gray-700">
+        <div class="flex items-center justify-between p-6 border-b border-gray-700">
+            <h2 class="text-2xl font-bold text-white">Share Playlist</h2>
+            <button type="button" class="text-gray-400 hover:text-white text-3xl leading-none" onclick="toggleModal('shareLinkModal')">&times;</button>
+        </div>
+        <div class="p-6 space-y-4">
+            <p class="text-gray-300">Share this public link to display the playlist:</p>
+            <div class="flex items-center space-x-3 bg-gray-900 p-4 rounded-lg border border-gray-700">
+                <code id="shareUrl" class="flex-1 text-dsp-blue font-mono text-sm break-all"></code>
+                <button type="button" class="bg-gray-700 text-white font-semibold py-2 px-4 text-sm rounded-md hover:bg-gray-600 transition whitespace-nowrap" onclick="copyShareLink()">
+                    📋 Copy
+                </button>
+            </div>
+            <p class="text-xs text-gray-400">Anyone with this link can view the playlist. Disable sharing in playlist settings to revoke access.</p>
+        </div>
+        <div class="flex justify-end p-6 border-t border-gray-700 bg-gray-900">
+            <button type="button" class="bg-gradient-to-r from-dsp-blue to-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:from-blue-600 hover:to-blue-700 transition shadow-lg" onclick="toggleModal('shareLinkModal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Form -->
 <form id="deleteForm" method="POST" action="?page=playlists" style="display: none;">
     <input type="hidden" name="action" value="delete_playlist">
     <input type="hidden" name="playlist_id" id="deletePlaylistId">
 </form>
 
+<!-- Hidden forms for playlist operations -->
+<form id="addToPlaylistForm" method="POST" action="?page=playlists" style="display: none;">
+    <input type="hidden" name="action" value="add_to_playlist">
+    <input type="hidden" name="playlist_id" value="<?php echo $editPlaylist['id'] ?? ''; ?>">
+    <input type="hidden" name="content_id" id="addContentId">
+</form>
+
+<form id="removeFromPlaylistForm" method="POST" action="?page=playlists" style="display: none;">
+    <input type="hidden" name="action" value="remove_from_playlist">
+    <input type="hidden" name="playlist_item_id" id="removeItemId">
+</form>
+
+<form id="reorderForm" method="POST" action="?page=playlists" style="display: none;">
+    <input type="hidden" name="action" value="reorder_playlist">
+    <input type="hidden" name="playlist_id" value="<?php echo $editPlaylist['id'] ?? ''; ?>">
+    <input type="hidden" name="order" id="newOrder">
+</form>
+
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
-// Initialize drag and drop
-<?php if ($editPlaylist): ?>
-const playlistId = <?php echo $editPlaylist['id']; ?>;
-const playlistItems = document.getElementById('playlistItems');
-
-// Make playlist items sortable
-new Sortable(playlistItems, {
-    animation: 150,
-    handle: '.drag-handle',
-    ghostClass: 'sortable-ghost',
-    dragClass: 'sortable-drag'
-});
-<?php endif; ?>
-
-function addToPlaylist(element) {
-    const contentId = element.dataset.contentId;
-    const title = element.dataset.title;
-    const duration = element.dataset.duration;
-    const type = element.dataset.type;
-    const thumbnail = element.dataset.thumbnail;
-    
-    const playlistItems = document.getElementById('playlistItems');
-    
-    // Remove empty message if exists
-    const emptyMsg = playlistItems.querySelector('.empty-message');
-    if (emptyMsg) emptyMsg.remove();
-    
-    // Create playlist item
-    const item = document.createElement('div');
-    item.className = 'playlist-item';
-    item.draggable = true;
-    item.dataset.contentId = contentId;
-    item.dataset.duration = duration;
-    
-    const thumbHtml = type === 'image' 
-        ? `<img src="${thumbnail}" alt="${title}">`
-        : '<div class="video-thumb">🎥</div>';
-    
-    const durationHtml = type === 'image'
-        ? `<input type="number" class="duration-input" value="${duration}" min="1" max="300" placeholder="Duration (s)">`
-        : `<span class="video-duration">⏱️ ${duration}s (auto)</span>`;
-    
-    item.innerHTML = `
-        <div class="drag-handle">⋮⋮</div>
-        <div class="item-thumbnail">${thumbHtml}</div>
-        <div class="item-details">
-            <strong>${title}</strong>
-            ${durationHtml}
-        </div>
-        <button type="button" class="btn-remove" onclick="removeFromPlaylist(this.parentElement)">×</button>
-    `;
-    
-    playlistItems.appendChild(item);
-    
-    // Remove from available content
-    element.remove();
-    
-    // Check if available content is empty
-    const availableContent = document.getElementById('availableContent');
-    if (availableContent.children.length === 0) {
-        availableContent.innerHTML = '<p class="empty-message">All content has been added to this playlist.</p>';
-    }
-}
-
-function removeFromPlaylist(element) {
-    const contentId = element.dataset.contentId;
-    const type = element.dataset.type;
-    const duration = element.dataset.duration;
-    
-    // Get title and thumbnail from the element
-    const title = element.querySelector('.item-details strong').textContent;
-    const thumbnailElement = element.querySelector('.item-thumbnail img, .item-thumbnail .video-thumb');
-    let thumbnail = '';
-    
-    if (thumbnailElement.tagName === 'IMG') {
-        thumbnail = thumbnailElement.src;
-    }
-    
-    element.remove();
-    
-    // Check if playlist is empty
-    const playlistItems = document.getElementById('playlistItems');
-    if (playlistItems.children.length === 0) {
-        playlistItems.innerHTML = '<p class="empty-message">No items in this playlist. Add content from the left.</p>';
-    }
-    
-    // Add back to available content
-    const availableContent = document.getElementById('availableContent');
-    
-    // Remove empty message if exists
-    const emptyMsg = availableContent.querySelector('.empty-message');
-    if (emptyMsg) emptyMsg.remove();
-    
-    // Create content item
-    const item = document.createElement('div');
-    item.className = 'content-item';
-    item.dataset.contentId = contentId;
-    item.dataset.title = title;
-    item.dataset.duration = duration;
-    item.dataset.type = type;
-    item.dataset.thumbnail = thumbnail;
-    
-    const thumbHtml = type === 'image' && thumbnail
-        ? `<img src="${thumbnail}" alt="${title}">`
-        : '<div class="video-thumb">🎥</div>';
-    
-    item.innerHTML = `
-        <div class="content-thumbnail">${thumbHtml}</div>
-        <div class="content-details">
-            <strong>${title}</strong>
-            <span>${duration}s</span>
-        </div>
-        <button type="button" class="btn-add" onclick="addToPlaylist(this.parentElement)">+</button>
-    `;
-    
-    availableContent.appendChild(item);
-}
-
-function savePlaylist() {
-    const items = [];
-    const playlistItemElements = document.querySelectorAll('.playlist-item');
-    
-    playlistItemElements.forEach((item, index) => {
-        const durationInput = item.querySelector('.duration-input');
-        const itemData = {
-            content_id: item.dataset.contentId
-        };
-        
-        // Only include duration for images (videos use their actual duration)
-        if (item.dataset.type === 'image' && durationInput) {
-            itemData.duration = durationInput.value;
-        }
-        
-        items.push(itemData);
-    });
-    
-    // Send via AJAX
-    fetch('?page=playlists', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `action=save_playlist_items&playlist_id=${playlistId}&items=${encodeURIComponent(JSON.stringify(items))}`
-    })
-    .then(response => {
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
-        return response.text();
-    })
-    .then(text => {
-        console.log('Raw response:', text);
-        try {
-            const data = JSON.parse(text);
-            if (data.success) {
-                alert('✅ Playlist saved successfully!');
-            } else {
-                alert('❌ Error: ' + data.message);
-            }
-        } catch (e) {
-            console.error('JSON parse error:', e);
-            console.error('Response text:', text);
-            alert('❌ Error: Invalid response from server. Check console for details.');
-        }
-    })
-    .catch(error => {
-        console.error('Fetch error:', error);
-        alert('❌ Error saving playlist: ' + error.message);
-    });
-}
-
 function toggleModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal.style.display === 'none') {
-        modal.style.display = 'block';
+        modal.style.display = 'flex';
     } else {
         modal.style.display = 'none';
     }
 }
 
-function toggleDropdown(playlistId) {
-    const dropdown = document.getElementById('dropdown-' + playlistId);
-    const allDropdowns = document.querySelectorAll('.dropdown-menu');
-    
-    // Close all other dropdowns
-    allDropdowns.forEach(d => {
-        if (d !== dropdown) d.classList.remove('show');
-    });
-    
-    dropdown.classList.toggle('show');
-}
-
-// Close dropdowns when clicking outside
-document.addEventListener('click', function(event) {
-    if (!event.target.matches('.dropdown-toggle')) {
-        const dropdowns = document.querySelectorAll('.dropdown-menu');
-        dropdowns.forEach(d => d.classList.remove('show'));
-    }
-});
-
-function copyToClipboard(text, event) {
-    event.stopPropagation();
-    navigator.clipboard.writeText(text).then(() => {
-        alert('Short URL copied to clipboard!');
-    }).catch(err => {
-        console.error('Failed to copy:', err);
-        // Fallback for older browsers
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        alert('Short URL copied to clipboard!');
-    });
-}
-
 function confirmDelete(playlistId, playlistName) {
-    if (confirm('Are you sure you want to delete "' + playlistName + '"?\n\nThis action cannot be undone.')) {
+    if (confirm('Are you sure you want to delete "' + playlistName + '"?\\n\\nThis action cannot be undone.')) {
         document.getElementById('deletePlaylistId').value = playlistId;
         document.getElementById('deleteForm').submit();
     }
 }
 
-// Copy share URL to clipboard
-function copyShareUrl() {
-    const shareUrl = document.getElementById('shareUrl');
-    const text = shareUrl.textContent;
-    
-    navigator.clipboard.writeText(text).then(() => {
-        alert('✅ Share URL copied to clipboard!');
-    }).catch(err => {
-        // Fallback for older browsers
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        alert('✅ Share URL copied to clipboard!');
+function showShareLink(playlistId) {
+    fetch('?page=playlists&action=get_share_link&id=' + playlistId)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('shareUrl').textContent = data.url;
+                toggleModal('shareLinkModal');
+            } else {
+                alert('Failed to get share link');
+            }
+        });
+}
+
+function copyShareLink() {
+    const url = document.getElementById('shareUrl').textContent;
+    const textArea = document.createElement('textarea');
+    textArea.value = url;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    alert('Link copied to clipboard!');
+}
+
+function addToPlaylist(contentId) {
+    document.getElementById('addContentId').value = contentId;
+    document.getElementById('addToPlaylistForm').submit();
+}
+
+function removeFromPlaylist(itemId) {
+    if (confirm('Remove this item from the playlist?')) {
+        document.getElementById('removeItemId').value = itemId;
+        document.getElementById('removeFromPlaylistForm').submit();
+    }
+}
+
+// Initialize SortableJS for drag-and-drop
+<?php if ($editPlaylist && !empty($playlistItems)): ?>
+const playlistEl = document.getElementById('playlistItems');
+if (playlistEl) {
+    Sortable.create(playlistEl, {
+        animation: 150,
+        handle: '.cursor-move',
+        onEnd: function(evt) {
+            // Get new order
+            const items = playlistEl.querySelectorAll('[data-id]');
+            const order = Array.from(items).map(item => item.getAttribute('data-id'));
+            
+            // Submit reorder
+            document.getElementById('newOrder').value = JSON.stringify(order);
+            document.getElementById('reorderForm').submit();
+        }
     });
 }
+<?php endif; ?>
 
 // Close modal when clicking outside
 window.onclick = function(event) {
-    if (event.target.classList.contains('modal')) {
-        event.target.style.display = 'none';
+    if (event.target.classList.contains('fixed')) {
+        const modals = document.querySelectorAll('.fixed');
+        modals.forEach(modal => {
+            if (modal.contains(event.target) && event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
     }
 }
 </script>
