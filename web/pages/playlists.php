@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
     }
     
-    // Save playlist items
+    // Save playlist items (AJAX)
     if ($_POST['action'] === 'save_playlist_items') {
         $playlistId = intval($_POST['playlist_id'] ?? 0);
         $items = json_decode($_POST['items'] ?? '[]', true);
@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             logActivity($db, $userId, 'playlist_items_updated', 'playlist', $playlistId, 'Updated playlist items');
             jsonResponse(['success' => true, 'message' => 'Playlist saved successfully']);
         } catch (Exception $e) {
-            jsonResponse(['success' => false, 'message' => 'Failed to save playlist'], 500);
+            jsonResponse(['success' => false, 'message' => 'Failed to save playlist: ' . $e->getMessage()], 500);
         }
     }
     
@@ -286,6 +286,7 @@ if (isset($_GET['edit'])) {
                         <?php foreach ($playlistItems as $item): ?>
                         <div class="playlist-item" draggable="true" 
                              data-content-id="<?php echo $item['content_id']; ?>"
+                             data-type="<?php echo $item['file_type']; ?>"
                              data-duration="<?php echo $item['duration_override'] ?: $item['default_duration']; ?>">
                             <div class="drag-handle">⋮⋮</div>
                             <div class="item-thumbnail">
@@ -298,9 +299,13 @@ if (isset($_GET['edit'])) {
                             </div>
                             <div class="item-details">
                                 <strong><?php echo sanitize($item['title']); ?></strong>
-                                <input type="number" class="duration-input" 
-                                       value="<?php echo $item['duration_override'] ?: $item['default_duration']; ?>" 
-                                       min="1" max="300" placeholder="Duration (s)">
+                                <?php if ($item['file_type'] === 'image'): ?>
+                                    <input type="number" class="duration-input" 
+                                           value="<?php echo $item['duration_override'] ?: $item['default_duration']; ?>" 
+                                           min="1" max="300" placeholder="Duration (s)">
+                                <?php else: ?>
+                                    <span class="video-duration">⏱️ <?php echo $item['default_duration']; ?>s (auto)</span>
+                                <?php endif; ?>
                             </div>
                             <button type="button" class="btn-remove" onclick="removeFromPlaylist(this.parentElement)">×</button>
                         </div>
@@ -439,12 +444,16 @@ function addToPlaylist(element) {
         ? `<img src="${thumbnail}" alt="${title}">`
         : '<div class="video-thumb">🎥</div>';
     
+    const durationHtml = type === 'image'
+        ? `<input type="number" class="duration-input" value="${duration}" min="1" max="300" placeholder="Duration (s)">`
+        : `<span class="video-duration">⏱️ ${duration}s (auto)</span>`;
+    
     item.innerHTML = `
         <div class="drag-handle">⋮⋮</div>
         <div class="item-thumbnail">${thumbHtml}</div>
         <div class="item-details">
             <strong>${title}</strong>
-            <input type="number" class="duration-input" value="${duration}" min="1" max="300" placeholder="Duration (s)">
+            ${durationHtml}
         </div>
         <button type="button" class="btn-remove" onclick="removeFromPlaylist(this.parentElement)">×</button>
     `;
@@ -481,10 +490,16 @@ function savePlaylist() {
     
     playlistItemElements.forEach((item, index) => {
         const durationInput = item.querySelector('.duration-input');
-        items.push({
-            content_id: item.dataset.contentId,
-            duration: durationInput ? durationInput.value : item.dataset.duration
-        });
+        const itemData = {
+            content_id: item.dataset.contentId
+        };
+        
+        // Only include duration for images (videos use their actual duration)
+        if (item.dataset.type === 'image' && durationInput) {
+            itemData.duration = durationInput.value;
+        }
+        
+        items.push(itemData);
     });
     
     // Send via AJAX

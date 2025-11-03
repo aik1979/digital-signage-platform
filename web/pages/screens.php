@@ -43,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $orientation = sanitize($_POST['orientation'] ?? 'landscape');
         $resolution = sanitize($_POST['resolution'] ?? '1920x1080');
         $notes = sanitize($_POST['notes'] ?? '');
+        $currentPlaylistId = !empty($_POST['current_playlist_id']) ? intval($_POST['current_playlist_id']) : null;
         $isActive = isset($_POST['is_active']) ? 1 : 0;
         
         if (empty($name)) {
@@ -60,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         'orientation' => $orientation,
                         'resolution' => $resolution,
                         'notes' => $notes,
+                        'current_playlist_id' => $currentPlaylistId,
                         'is_active' => $isActive
                     ], 'id = :id', ['id' => $screenId]);
                     
@@ -288,6 +290,22 @@ if (isset($_GET['edit'])) {
             <div class="form-group">
                 <label for="edit_notes">Notes</label>
                 <textarea id="edit_notes" name="notes" rows="3"><?php echo sanitize($editScreen['notes'] ?? ''); ?></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="edit_playlist">Assigned Playlist</label>
+                <select id="edit_playlist" name="current_playlist_id">
+                    <option value="">-- Use Default Playlist --</option>
+                    <?php
+                    $playlists = $db->fetchAll("SELECT id, name, is_default FROM playlists WHERE user_id = ? ORDER BY is_default DESC, name ASC", [$userId]);
+                    foreach ($playlists as $pl) {
+                        $selected = ($editScreen['current_playlist_id'] == $pl['id']) ? 'selected' : '';
+                        $defaultLabel = $pl['is_default'] ? ' (Default)' : '';
+                        echo '<option value="' . $pl['id'] . '" ' . $selected . '>' . htmlspecialchars($pl['name']) . $defaultLabel . '</option>';
+                    }
+                    ?>
+                </select>
+                <small>Select which playlist to display on this screen</small>
             </div>
             
             <div class="form-group">

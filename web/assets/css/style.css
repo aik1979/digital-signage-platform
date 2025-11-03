@@ -1224,6 +1224,12 @@ a:hover {
     font-size: 12px;
 }
 
+.video-duration {
+    color: #666;
+    font-size: 12px;
+    font-style: italic;
+}
+
 .btn-add,
 .btn-remove {
     width: 32px;
