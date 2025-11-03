@@ -38,6 +38,7 @@
                     <a href="?page=content" class="px-4 py-2 rounded-md text-sm font-medium transition-colors <?php echo $page === 'content' ? 'bg-dsp-blue text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?>">Content</a>
                     <a href="?page=playlists" class="px-4 py-2 rounded-md text-sm font-medium transition-colors <?php echo $page === 'playlists' ? 'bg-dsp-blue text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?>">Playlists</a>
                     <a href="?page=schedules" class="px-4 py-2 rounded-md text-sm font-medium transition-colors <?php echo $page === 'schedules' ? 'bg-dsp-blue text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?>">Schedules</a>
+                    <a href="?page=getting-started" class="px-4 py-2 rounded-md text-sm font-medium transition-colors <?php echo $page === 'getting-started' ? 'bg-green-600 text-white' : 'text-green-400 hover:bg-green-900 hover:text-green-300'; ?>">📖 Guide</a>
                 </div>
                 <div class="flex items-center space-x-4">
                     <span class="text-gray-300 text-sm">Welcome, <?php echo sanitize($_SESSION['user_name']); ?></span>
