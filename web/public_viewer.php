@@ -194,7 +194,7 @@ $itemsJson = json_encode($items);
 </head>
 <body>
     <div class="branding">
-        <img src="/assets/images/logo.jpg" alt="DSP">
+        <img src="/assets/images/logo.svg" alt="DSP">
     </div>
     
     <div id="viewer" class="transition-<?php echo htmlspecialchars($transition); ?>">

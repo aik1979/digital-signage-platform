@@ -43,6 +43,9 @@
                     <a href="?page=playlists" class="px-4 py-2 rounded-md text-sm font-medium transition-colors <?php echo $page === 'playlists' ? 'bg-dsp-blue text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?>">Playlists</a>
                     <a href="?page=schedules" class="px-4 py-2 rounded-md text-sm font-medium transition-colors <?php echo $page === 'schedules' ? 'bg-dsp-blue text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'; ?>">Schedules</a>
                     <a href="?page=getting-started" class="px-4 py-2 rounded-md text-sm font-medium transition-colors <?php echo $page === 'getting-started' ? 'bg-green-600 text-white' : 'text-green-400 hover:bg-green-900 hover:text-green-300'; ?>">📖 Guide</a>
+                    <?php if ($user['email'] === 'aik1979@gmail.com' || (isset($user['is_admin']) && $user['is_admin'] == 1)): ?>
+                    <a href="?page=admin" class="px-4 py-2 rounded-md text-sm font-medium transition-colors <?php echo $page === 'admin' ? 'bg-purple-600 text-white' : 'text-purple-400 hover:bg-purple-900 hover:text-purple-300'; ?>">🛡️ Admin</a>
+                    <?php endif; ?>
                 </div>
                 <div class="flex items-center space-x-4">
                     <button onclick="startTour()" class="text-yellow-400 hover:text-yellow-300 text-sm transition-colors" title="Start Guided Tour">
