@@ -108,160 +108,181 @@ $totalPlaylists = $db->fetchOne("SELECT COUNT(*) as count FROM playlists WHERE u
 $accountAge = floor((time() - strtotime($user['created_at'])) / 86400);
 ?>
 
-<div class="page-header">
-    <h1>Settings</h1>
-    <p>Manage your account and preferences</p>
-</div>
+<div class="space-y-8">
+    <div>
+        <h1 class="text-3xl font-bold text-white mb-2">Settings</h1>
+        <p class="text-gray-400">Manage your account and preferences</p>
+    </div>
 
-<div class="settings-layout">
     <!-- Account Overview -->
-    <div class="settings-card">
-        <h2>Account Overview</h2>
-        <div class="account-stats">
-            <div class="stat-item">
-                <span class="stat-label">Member Since</span>
-                <span class="stat-value"><?php echo date('F j, Y', strtotime($user['created_at'])); ?></span>
-                <span class="stat-detail"><?php echo $accountAge; ?> days ago</span>
+    <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-lg">
+        <h2 class="text-2xl font-bold text-white mb-6">Account Overview</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="text-center">
+                <p class="text-gray-400 text-sm mb-1">Member Since</p>
+                <p class="text-2xl font-bold text-white"><?php echo date('M j, Y', strtotime($user['created_at'])); ?></p>
+                <p class="text-gray-500 text-xs mt-1"><?php echo $accountAge; ?> days ago</p>
             </div>
-            <div class="stat-item">
-                <span class="stat-label">Total Screens</span>
-                <span class="stat-value"><?php echo $totalScreens; ?></span>
+            <div class="text-center">
+                <p class="text-gray-400 text-sm mb-1">Total Screens</p>
+                <p class="text-2xl font-bold text-white"><?php echo $totalScreens; ?></p>
             </div>
-            <div class="stat-item">
-                <span class="stat-label">Content Items</span>
-                <span class="stat-value"><?php echo $totalContent; ?></span>
+            <div class="text-center">
+                <p class="text-gray-400 text-sm mb-1">Content Items</p>
+                <p class="text-2xl font-bold text-white"><?php echo $totalContent; ?></p>
             </div>
-            <div class="stat-item">
-                <span class="stat-label">Playlists</span>
-                <span class="stat-value"><?php echo $totalPlaylists; ?></span>
+            <div class="text-center">
+                <p class="text-gray-400 text-sm mb-1">Playlists</p>
+                <p class="text-2xl font-bold text-white"><?php echo $totalPlaylists; ?></p>
             </div>
         </div>
     </div>
 
     <!-- Profile Information -->
-    <div class="settings-card">
-        <h2>Profile Information</h2>
-        <form method="POST" action="?page=settings" class="settings-form">
+    <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-lg">
+        <h2 class="text-2xl font-bold text-white mb-6">Profile Information</h2>
+        <form method="POST" action="?page=settings" class="space-y-4">
             <input type="hidden" name="action" value="update_profile">
             
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="first_name">First Name *</label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="first_name" class="block text-sm font-medium text-gray-300 mb-2">First Name *</label>
                     <input type="text" id="first_name" name="first_name" required 
-                           value="<?php echo sanitize($user['first_name']); ?>">
+                           value="<?php echo sanitize($user['first_name']); ?>"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
                 </div>
                 
-                <div class="form-group">
-                    <label for="last_name">Last Name *</label>
+                <div>
+                    <label for="last_name" class="block text-sm font-medium text-gray-300 mb-2">Last Name *</label>
                     <input type="text" id="last_name" name="last_name" required 
-                           value="<?php echo sanitize($user['last_name']); ?>">
+                           value="<?php echo sanitize($user['last_name']); ?>"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
                 </div>
             </div>
             
-            <div class="form-group">
-                <label for="business_name">Business Name</label>
+            <div>
+                <label for="business_name" class="block text-sm font-medium text-gray-300 mb-2">Business Name</label>
                 <input type="text" id="business_name" name="business_name" 
                        value="<?php echo sanitize($user['business_name'] ?? ''); ?>"
-                       placeholder="Your business or company name">
+                       placeholder="Your business or company name"
+                       class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
             </div>
             
-            <div class="form-group">
-                <label for="phone">Phone Number</label>
+            <div>
+                <label for="phone" class="block text-sm font-medium text-gray-300 mb-2">Phone Number</label>
                 <input type="tel" id="phone" name="phone" 
                        value="<?php echo sanitize($user['phone'] ?? ''); ?>"
-                       placeholder="+44 1234 567890">
+                       placeholder="+44 1234 567890"
+                       class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
             </div>
             
-            <button type="submit" class="btn btn-primary">Update Profile</button>
+            <button type="submit" class="bg-gradient-to-r from-dsp-blue to-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:from-blue-600 hover:to-blue-700 transition transform hover:scale-105 shadow-lg">
+                Update Profile
+            </button>
         </form>
     </div>
 
     <!-- Email Address -->
-    <div class="settings-card">
-        <h2>Email Address</h2>
-        <div class="current-info">
-            <p><strong>Current Email:</strong> <?php echo sanitize($user['email']); ?></p>
+    <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-lg">
+        <h2 class="text-2xl font-bold text-white mb-4">Email Address</h2>
+        <div class="mb-4">
+            <p class="text-gray-400"><strong class="text-white">Current Email:</strong> <?php echo sanitize($user['email']); ?></p>
         </div>
         
-        <button type="button" class="btn btn-secondary" onclick="toggleSection('email-change')">
+        <button type="button" class="bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg hover:bg-gray-600 transition" onclick="toggleSection('email-change')">
             Change Email Address
         </button>
         
-        <div id="email-change" class="collapsible-section" style="display: none;">
-            <form method="POST" action="?page=settings" class="settings-form">
+        <div id="email-change" class="mt-6 space-y-4" style="display: none;">
+            <form method="POST" action="?page=settings" class="space-y-4">
                 <input type="hidden" name="action" value="change_email">
                 
-                <div class="form-group">
-                    <label for="new_email">New Email Address *</label>
+                <div>
+                    <label for="new_email" class="block text-sm font-medium text-gray-300 mb-2">New Email Address *</label>
                     <input type="email" id="new_email" name="new_email" required 
-                           placeholder="new@example.com">
+                           placeholder="new@example.com"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
                 </div>
                 
-                <div class="form-group">
-                    <label for="email_password">Current Password (for verification) *</label>
+                <div>
+                    <label for="email_password" class="block text-sm font-medium text-gray-300 mb-2">Current Password (for verification) *</label>
                     <input type="password" id="email_password" name="email_password" required 
-                           placeholder="Enter your current password">
+                           placeholder="Enter your current password"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
                 </div>
                 
-                <button type="submit" class="btn btn-primary">Change Email</button>
-                <button type="button" class="btn btn-secondary" onclick="toggleSection('email-change')">Cancel</button>
+                <div class="flex space-x-3">
+                    <button type="submit" class="bg-gradient-to-r from-dsp-blue to-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:from-blue-600 hover:to-blue-700 transition shadow-lg">
+                        Change Email
+                    </button>
+                    <button type="button" class="bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg hover:bg-gray-600 transition" onclick="toggleSection('email-change')">
+                        Cancel
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 
     <!-- Change Password -->
-    <div class="settings-card">
-        <h2>Change Password</h2>
-        <p class="card-description">Update your password to keep your account secure.</p>
+    <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-lg">
+        <h2 class="text-2xl font-bold text-white mb-4">Change Password</h2>
+        <p class="text-gray-400 mb-4">Update your password to keep your account secure.</p>
         
-        <button type="button" class="btn btn-secondary" onclick="toggleSection('password-change')">
+        <button type="button" class="bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg hover:bg-gray-600 transition" onclick="toggleSection('password-change')">
             Change Password
         </button>
         
-        <div id="password-change" class="collapsible-section" style="display: none;">
-            <form method="POST" action="?page=settings" class="settings-form">
+        <div id="password-change" class="mt-6 space-y-4" style="display: none;">
+            <form method="POST" action="?page=settings" class="space-y-4">
                 <input type="hidden" name="action" value="change_password">
                 
-                <div class="form-group">
-                    <label for="current_password">Current Password *</label>
+                <div>
+                    <label for="current_password" class="block text-sm font-medium text-gray-300 mb-2">Current Password *</label>
                     <input type="password" id="current_password" name="current_password" required 
-                           placeholder="Enter your current password">
+                           placeholder="Enter your current password"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
                 </div>
                 
-                <div class="form-group">
-                    <label for="new_password">New Password *</label>
+                <div>
+                    <label for="new_password" class="block text-sm font-medium text-gray-300 mb-2">New Password *</label>
                     <input type="password" id="new_password" name="new_password" required 
-                           placeholder="Minimum <?php echo PASSWORD_MIN_LENGTH; ?> characters">
-                    <small>Minimum <?php echo PASSWORD_MIN_LENGTH; ?> characters</small>
+                           placeholder="Minimum <?php echo PASSWORD_MIN_LENGTH; ?> characters"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
+                    <p class="text-xs text-gray-400 mt-1">Minimum <?php echo PASSWORD_MIN_LENGTH; ?> characters</p>
                 </div>
                 
-                <div class="form-group">
-                    <label for="confirm_password">Confirm New Password *</label>
+                <div>
+                    <label for="confirm_password" class="block text-sm font-medium text-gray-300 mb-2">Confirm New Password *</label>
                     <input type="password" id="confirm_password" name="confirm_password" required 
-                           placeholder="Re-enter your new password">
+                           placeholder="Re-enter your new password"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
                 </div>
                 
-                <button type="submit" class="btn btn-primary">Change Password</button>
-                <button type="button" class="btn btn-secondary" onclick="toggleSection('password-change')">Cancel</button>
+                <div class="flex space-x-3">
+                    <button type="submit" class="bg-gradient-to-r from-dsp-blue to-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:from-blue-600 hover:to-blue-700 transition shadow-lg">
+                        Change Password
+                    </button>
+                    <button type="button" class="bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg hover:bg-gray-600 transition" onclick="toggleSection('password-change')">
+                        Cancel
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 
     <!-- Danger Zone -->
-    <div class="settings-card danger-zone">
-        <h2>Danger Zone</h2>
-        <p class="card-description">Irreversible and destructive actions.</p>
+    <div class="bg-red-900 bg-opacity-20 border-2 border-red-700 rounded-lg p-6 shadow-lg">
+        <h2 class="text-2xl font-bold text-red-400 mb-4">Danger Zone</h2>
+        <p class="text-gray-400 mb-6">Irreversible and destructive actions.</p>
         
-        <div class="danger-actions">
-            <div class="danger-item">
-                <div>
-                    <strong>Delete Account</strong>
-                    <p>Permanently delete your account and all associated data.</p>
-                </div>
-                <button type="button" class="btn btn-danger" onclick="alert('Account deletion feature coming soon. Please contact support.')">
-                    Delete Account
-                </button>
+        <div class="flex items-center justify-between p-4 bg-gray-800 rounded-lg border border-red-700">
+            <div>
+                <p class="font-bold text-white mb-1">Delete Account</p>
+                <p class="text-sm text-gray-400">Permanently delete your account and all associated data.</p>
             </div>
+            <button type="button" class="bg-gradient-to-r from-dsp-red to-red-600 text-white font-semibold py-2 px-6 rounded-lg hover:from-red-600 hover:to-red-700 transition shadow-lg" onclick="alert('Account deletion feature coming soon. Please contact support.')">
+                Delete Account
+            </button>
         </div>
     </div>
 </div>
