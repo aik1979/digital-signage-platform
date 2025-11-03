@@ -954,16 +954,61 @@ a:hover {
 }
 
 .playlist-editor {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
     margin: 20px 0;
 }
 
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.editor-header h2 {
+    color: #000000;
+    margin-bottom: 5px;
+}
+
+.editor-header p {
+    color: #666;
+    font-size: 14px;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.editor-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
 @media (max-width: 1024px) {
-    .playlist-editor {
+    .editor-content {
         grid-template-columns: 1fr;
     }
+}
+
+.content-library-panel,
+.playlist-panel {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.content-library-panel h3,
+.playlist-panel h3 {
+    color: #000000;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498DB;
 }
 
 .editor-panel {
