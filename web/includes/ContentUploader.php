@@ -49,11 +49,17 @@ class ContentUploader {
             return ['success' => false, 'message' => 'Failed to save file'];
         }
         
-        // Get image dimensions if image
+        // Optimize image if image type
         $width = null;
         $height = null;
         if ($fileType === 'image') {
-            list($width, $height) = getimagesize($filePath);
+            $optimized = $this->optimizeImage($filePath);
+            if ($optimized) {
+                list($width, $height) = getimagesize($filePath);
+            } else {
+                // If optimization fails, still get original dimensions
+                list($width, $height) = getimagesize($filePath);
+            }
         }
         
         // Get video duration if video
@@ -177,6 +183,93 @@ class ContentUploader {
         imagedestroy($thumbnail);
         
         return 'uploads/thumbnails/' . $thumbnailFilename;
+    }
+    
+    /**
+     * Optimize image - resize to 4K max and compress
+     */
+    private function optimizeImage($filePath) {
+        // Maximum dimensions (4K)
+        $maxWidth = 3840;
+        $maxHeight = 2160;
+        
+        // Get image info
+        $imageInfo = getimagesize($filePath);
+        if (!$imageInfo) {
+            return false;
+        }
+        
+        list($originalWidth, $originalHeight) = $imageInfo;
+        $mimeType = $imageInfo['mime'];
+        
+        // Check if optimization is needed
+        $needsResize = ($originalWidth > $maxWidth || $originalHeight > $maxHeight);
+        
+        // Always optimize JPEG quality, resize if needed
+        if (!$needsResize && $mimeType !== 'image/jpeg' && $mimeType !== 'image/jpg') {
+            return true; // No optimization needed for small PNGs
+        }
+        
+        // Load source image
+        switch ($mimeType) {
+            case 'image/jpeg':
+            case 'image/jpg':
+                $source = imagecreatefromjpeg($filePath);
+                break;
+            case 'image/png':
+                $source = imagecreatefrompng($filePath);
+                break;
+            default:
+                return false;
+        }
+        
+        if (!$source) {
+            return false;
+        }
+        
+        // Calculate new dimensions (maintain aspect ratio)
+        if ($needsResize) {
+            $ratio = min($maxWidth / $originalWidth, $maxHeight / $originalHeight);
+            $newWidth = floor($originalWidth * $ratio);
+            $newHeight = floor($originalHeight * $ratio);
+        } else {
+            $newWidth = $originalWidth;
+            $newHeight = $originalHeight;
+        }
+        
+        // Create optimized image
+        $optimized = imagecreatetruecolor($newWidth, $newHeight);
+        
+        // Preserve transparency for PNG
+        if ($mimeType === 'image/png') {
+            imagealphablending($optimized, false);
+            imagesavealpha($optimized, true);
+            $transparent = imagecolorallocatealpha($optimized, 0, 0, 0, 127);
+            imagefill($optimized, 0, 0, $transparent);
+        }
+        
+        // Resize with high quality
+        imagecopyresampled($optimized, $source, 0, 0, 0, 0, $newWidth, $newHeight, $originalWidth, $originalHeight);
+        
+        // Save optimized image
+        $success = false;
+        switch ($mimeType) {
+            case 'image/jpeg':
+            case 'image/jpg':
+                // JPEG with 85% quality (good balance of size/quality)
+                $success = imagejpeg($optimized, $filePath, 85);
+                break;
+            case 'image/png':
+                // PNG with compression level 8 (0-9, higher = smaller file)
+                $success = imagepng($optimized, $filePath, 8);
+                break;
+        }
+        
+        // Free memory
+        imagedestroy($source);
+        imagedestroy($optimized);
+        
+        return $success;
     }
     
     /**
