@@ -499,11 +499,7 @@ if (isset($_GET['edit'])) {
 </form>
 
 <!-- Hidden forms for playlist operations -->
-<form id="addToPlaylistForm" method="POST" action="?page=playlists" style="display: none;">
-    <input type="hidden" name="action" value="add_to_playlist">
-    <input type="hidden" name="playlist_id" value="<?php echo $editPlaylist['id'] ?? ''; ?>">
-    <input type="hidden" name="content_id" id="addContentId">
-</form>
+
 
 <form id="removeFromPlaylistForm" method="POST" action="?page=playlists" style="display: none;">
     <input type="hidden" name="action" value="remove_from_playlist">
@@ -559,8 +555,34 @@ function copyShareLink() {
 }
 
 function addToPlaylist(contentId) {
-    document.getElementById('addContentId').value = contentId;
-    document.getElementById('addToPlaylistForm').submit();
+    const urlParams = new URLSearchParams(window.location.search);
+    const playlistId = urlParams.get('edit');
+
+    const playlistItemsEl = document.getElementById('playlistItems');
+    const existingItems = Array.from(playlistItemsEl.querySelectorAll('[data-id]')).map(item => ({
+        content_id: item.getAttribute('data-id'),
+        duration: item.querySelector('input[name="duration"]').value
+    }));
+
+    const newItems = [...existingItems, { content_id: contentId, duration: 10 }];
+
+    const formData = new FormData();
+    formData.append('action', 'save_playlist_items');
+    formData.append('playlist_id', playlistId);
+    formData.append('items', JSON.stringify(newItems));
+
+    fetch('?page=playlists', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Failed to add item to playlist.');
+        }
+    });
 }
 
 function removeFromPlaylist(itemId) {
