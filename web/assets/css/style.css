@@ -1301,20 +1301,21 @@ a:hover {
 }
 
 .checkbox-group {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
     margin-top: 8px;
 }
 
 .checkbox-label {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     cursor: pointer;
-    padding: 6px;
+    padding: 8px 12px;
     border-radius: 4px;
     transition: background 0.2s;
+    white-space: nowrap;
 }
 
 .checkbox-label:hover {
@@ -1323,6 +1324,7 @@ a:hover {
 
 .checkbox-label input[type="checkbox"] {
     cursor: pointer;
+    margin: 0;
 }
 
 .btn-add,

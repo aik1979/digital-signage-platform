@@ -1,5 +1,8 @@
 <?php
-$userId = $auth->getUserId();
+// Only process if this is being included for display (not POST handling)
+if (!isset($userId)) {
+    $userId = $auth->getUserId();
+}
 
 // Handle schedule actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
@@ -110,8 +113,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-// Get all schedules with screen and playlist names
-$schedules = $db->fetchAll(
+// Only fetch data if not a POST request (prevents errors on refresh)
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    // Get all schedules with screen and playlist names
+    $schedules = $db->fetchAll(
     "SELECT s.*, sc.name as screen_name, p.name as playlist_name
      FROM schedules s
      JOIN screens sc ON s.screen_id = sc.id
@@ -121,15 +126,22 @@ $schedules = $db->fetchAll(
     [$userId]
 );
 
-// Get screens and playlists for dropdowns
-$screens = $db->fetchAll("SELECT id, name FROM screens WHERE user_id = ? ORDER BY name", [$userId]);
-$playlists = $db->fetchAll("SELECT id, name FROM playlists WHERE user_id = ? ORDER BY name", [$userId]);
+    // Get screens and playlists for dropdowns
+    $screens = $db->fetchAll("SELECT id, name FROM screens WHERE user_id = ? ORDER BY name", [$userId]);
+    $playlists = $db->fetchAll("SELECT id, name FROM playlists WHERE user_id = ? ORDER BY name", [$userId]);
 
-// Get schedule for editing
-$editSchedule = null;
-if (isset($_GET['edit'])) {
-    $scheduleId = intval($_GET['edit']);
-    $editSchedule = $db->fetchOne("SELECT * FROM schedules WHERE id = ? AND user_id = ?", [$scheduleId, $userId]);
+    // Get schedule for editing
+    $editSchedule = null;
+    if (isset($_GET['edit'])) {
+        $scheduleId = intval($_GET['edit']);
+        $editSchedule = $db->fetchOne("SELECT * FROM schedules WHERE id = ? AND user_id = ?", [$scheduleId, $userId]);
+    }
+} else {
+    // POST request - set empty arrays to prevent errors
+    $schedules = [];
+    $screens = [];
+    $playlists = [];
+    $editSchedule = null;
 }
 
 // Days of week
