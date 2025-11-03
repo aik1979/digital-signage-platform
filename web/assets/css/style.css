@@ -800,6 +800,7 @@ a:hover {
     align-items: center;
     justify-content: center;
     position: relative;
+    margin-bottom: 0;
 }
 
 .content-preview img {
@@ -822,6 +823,7 @@ a:hover {
 
 .content-info {
     padding: 15px;
+    padding-top: 12px;
 }
 
 .content-info h4 {
