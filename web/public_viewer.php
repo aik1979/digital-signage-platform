@@ -33,6 +33,7 @@ if (!$playlist['share_enabled']) {
 }
 
 $transition = $playlist['transition'] ?? 'fade';
+$playlistId = $playlist['id'];
 
 // Get playlist items with content
 $items = $db->fetchAll(
