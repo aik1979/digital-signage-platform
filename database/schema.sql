@@ -83,6 +83,7 @@ CREATE TABLE IF NOT EXISTS playlists (
     user_id INT UNSIGNED NOT NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT DEFAULT NULL,
+    transition VARCHAR(20) DEFAULT 'fade' COMMENT 'Transition effect: fade, slide, zoom, none',
     is_default TINYINT(1) DEFAULT 0,
     is_active TINYINT(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

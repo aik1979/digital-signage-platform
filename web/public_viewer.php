@@ -1,7 +1,7 @@
 <?php
 /**
- * Screen Viewer - Browser-based display for testing
- * Access via: viewer.php?key=DEVICE_KEY
+ * Public Playlist Viewer - Shareable URL for browser-based display
+ * Access via: public_viewer.php?id=PLAYLIST_ID&token=SHARE_TOKEN
  */
 
 session_start();
@@ -11,74 +11,23 @@ require_once __DIR__ . '/includes/functions.php';
 
 $db = Database::getInstance();
 
-// Get device key from URL
-$deviceKey = isset($_GET['key']) ? trim($_GET['key']) : '';
-
-if (empty($deviceKey)) {
-    die('Error: No device key provided. Use: viewer.php?key=YOUR_DEVICE_KEY');
-}
-
-// Get screen info
-$screen = $db->fetchOne(
-    "SELECT s.*, u.id as user_id 
-     FROM screens s 
-     JOIN users u ON s.user_id = u.id 
-     WHERE s.device_key = ? AND s.is_active = 1",
-    [$deviceKey]
-);
-
-if (!$screen) {
-    die('Error: Invalid device key or screen is inactive.');
-}
-
-// Update heartbeat
-$db->update('screens', [
-    'last_heartbeat' => date('Y-m-d H:i:s'),
-    'is_online' => 1,
-    'last_ip' => $_SERVER['REMOTE_ADDR'] ?? null
-], 'id = :id', ['id' => $screen['id']]);
-
-// Determine which playlist to show based on schedule
-$currentDay = date('w'); // 0=Sunday, 6=Saturday
-$currentTime = date('H:i:s');
-$currentDate = date('Y-m-d');
-
-$activeSchedule = $db->fetchOne(
-    "SELECT playlist_id 
-     FROM schedules 
-     WHERE screen_id = ? 
-     AND is_active = 1
-     AND FIND_IN_SET(?, days_of_week) > 0
-     AND start_time <= ?
-     AND end_time >= ?
-     AND (start_date IS NULL OR start_date <= ?)
-     AND (end_date IS NULL OR end_date >= ?)
-     ORDER BY priority DESC
-     LIMIT 1",
-    [$screen['id'], $currentDay, $currentTime, $currentTime, $currentDate, $currentDate]
-);
-
-// Use scheduled playlist, assigned playlist, or default playlist
-$playlistId = null;
-if ($activeSchedule) {
-    $playlistId = $activeSchedule['playlist_id'];
-} elseif ($screen['current_playlist_id']) {
-    $playlistId = $screen['current_playlist_id'];
-} else {
-    // Get default playlist
-    $defaultPlaylist = $db->fetchOne(
-        "SELECT id FROM playlists WHERE user_id = ? AND is_default = 1 AND is_active = 1 LIMIT 1",
-        [$screen['user_id']]
-    );
-    $playlistId = $defaultPlaylist ? $defaultPlaylist['id'] : null;
-}
+// Get playlist ID from URL
+$playlistId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if (!$playlistId) {
-    die('Error: No playlist assigned to this screen.');
+    die('Error: No playlist specified.');
 }
 
-// Get playlist with transition setting
-$playlist = $db->fetchOne("SELECT transition FROM playlists WHERE id = ?", [$playlistId]);
+// Get playlist info
+$playlist = $db->fetchOne(
+    "SELECT id, name, transition, is_active FROM playlists WHERE id = ? AND is_active = 1",
+    [$playlistId]
+);
+
+if (!$playlist) {
+    die('Error: Playlist not found or inactive.');
+}
+
 $transition = $playlist['transition'] ?? 'fade';
 
 // Get playlist items with content
@@ -87,8 +36,8 @@ $items = $db->fetchAll(
         c.id,
         c.file_path,
         c.file_type,
-        c.duration,
         c.title,
+        c.duration,
         pi.duration_override,
         COALESCE(pi.duration_override, c.duration, 10) as display_duration
      FROM playlist_items pi
@@ -111,7 +60,7 @@ $itemsJson = json_encode($items);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($screen['name']); ?> - Digital Signage</title>
+    <title><?php echo htmlspecialchars($playlist['name']); ?> - Digital Signage</title>
     <style>
         * {
             margin: 0;
@@ -214,18 +163,33 @@ $itemsJson = json_encode($items);
             font-size: 24px;
             text-align: center;
         }
+        
+        .branding {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 128, 128, 0.9);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
+    <div class="branding">Digital Signage Platform</div>
+    
     <div id="viewer" class="transition-<?php echo htmlspecialchars($transition); ?>">
         <div class="loading">Loading content...</div>
     </div>
     
     <div id="info">
-        <div><strong><?php echo htmlspecialchars($screen['name']); ?></strong></div>
+        <div><strong><?php echo htmlspecialchars($playlist['name']); ?></strong></div>
         <div id="currentItem">Item 1 of <?php echo count($items); ?></div>
         <div id="timer">--</div>
-        <div style="margin-top: 5px; font-size: 10px; opacity: 0.7;">Press 'i' to toggle info</div>
+        <div style="margin-top: 5px; font-size: 10px; opacity: 0.7;">Press 'i' to toggle info | 'f' for fullscreen</div>
     </div>
 
     <script>
@@ -252,15 +216,20 @@ $itemsJson = json_encode($items);
             if (item.file_type === 'image') {
                 element = document.createElement('img');
                 element.src = item.file_path;
-                element.className = 'content-item active';
+                element.className = 'content-item';
                 element.alt = item.title || 'Content';
+                
+                // Add active class after a brief delay for transition
+                setTimeout(() => element.classList.add('active'), 50);
             } else if (item.file_type === 'video') {
                 element = document.createElement('video');
                 element.src = item.file_path;
-                element.className = 'content-item active';
+                element.className = 'content-item';
                 element.autoplay = true;
                 element.muted = false;
                 element.controls = false;
+                
+                setTimeout(() => element.classList.add('active'), 50);
                 
                 // When video ends, move to next item
                 element.addEventListener('ended', () => {
@@ -291,26 +260,11 @@ $itemsJson = json_encode($items);
             } else {
                 timerEl.textContent = 'Playing video...';
             }
-            
-            // Log playback
-            logPlayback(item.id);
         }
         
         function nextItem() {
             currentIndex = (currentIndex + 1) % items.length;
             showItem(currentIndex);
-        }
-        
-        function logPlayback(contentId) {
-            // Send playback log to server
-            fetch('api/log_playback.php', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    device_key: '<?php echo $deviceKey; ?>',
-                    content_id: contentId
-                })
-            }).catch(err => console.error('Failed to log playback:', err));
         }
         
         // Keyboard controls
@@ -332,15 +286,6 @@ $itemsJson = json_encode($items);
                 }
             }
         });
-        
-        // Heartbeat every 30 seconds
-        setInterval(() => {
-            fetch('api/heartbeat.php', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({device_key: '<?php echo $deviceKey; ?>'})
-            });
-        }, 30000);
         
         // Start playback
         if (items.length > 0) {

@@ -8,6 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'create_playlist') {
         $name = sanitize($_POST['name'] ?? '');
         $description = sanitize($_POST['description'] ?? '');
+        $transition = sanitize($_POST['transition'] ?? 'fade');
         $isDefault = isset($_POST['is_default']) ? 1 : 0;
         
         if (empty($name)) {
@@ -23,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     'user_id' => $userId,
                     'name' => $name,
                     'description' => $description,
+                    'transition' => $transition,
                     'is_default' => $isDefault,
                     'is_active' => 1
                 ]);
@@ -41,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $playlistId = intval($_POST['playlist_id'] ?? 0);
         $name = sanitize($_POST['name'] ?? '');
         $description = sanitize($_POST['description'] ?? '');
+        $transition = sanitize($_POST['transition'] ?? 'fade');
         $isDefault = isset($_POST['is_default']) ? 1 : 0;
         
         $playlist = $db->fetchOne("SELECT id FROM playlists WHERE id = ? AND user_id = ?", [$playlistId, $userId]);
@@ -56,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $db->update('playlists', [
                     'name' => $name,
                     'description' => $description,
+                    'transition' => $transition,
                     'is_default' => $isDefault
                 ], 'id = :id', ['id' => $playlistId]);
                 
@@ -214,6 +218,9 @@ if (isset($_GET['edit'])) {
             </div>
             
             <div class="playlist-actions">
+                <a href="public_viewer.php?id=<?php echo $playlist['id']; ?>" target="_blank" class="btn btn-secondary btn-sm" title="View in browser">
+                    🌐 View
+                </a>
                 <a href="?page=playlists&edit=<?php echo $playlist['id']; ?>" class="btn btn-primary btn-sm">
                     ✏️ Edit
                 </a>
@@ -345,6 +352,17 @@ if (isset($_GET['edit'])) {
                 </div>
                 
                 <div class="form-group">
+                    <label for="edit_transition">Transition Effect</label>
+                    <select id="edit_transition" name="transition">
+                        <option value="fade" <?php echo ($editPlaylist['transition'] ?? 'fade') === 'fade' ? 'selected' : ''; ?>>Fade</option>
+                        <option value="slide" <?php echo ($editPlaylist['transition'] ?? '') === 'slide' ? 'selected' : ''; ?>>Slide</option>
+                        <option value="zoom" <?php echo ($editPlaylist['transition'] ?? '') === 'zoom' ? 'selected' : ''; ?>>Zoom</option>
+                        <option value="none" <?php echo ($editPlaylist['transition'] ?? '') === 'none' ? 'selected' : ''; ?>>None (Instant)</option>
+                    </select>
+                    <small>Animation between content items</small>
+                </div>
+                
+                <div class="form-group">
                     <label>
                         <input type="checkbox" name="is_default" <?php echo $editPlaylist['is_default'] ? 'checked' : ''; ?>>
                         Set as default playlist (fallback for screens)
@@ -380,6 +398,17 @@ if (isset($_GET['edit'])) {
                 <label for="description">Description (Optional)</label>
                 <textarea id="description" name="description" rows="3" 
                           placeholder="Brief description of this playlist..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="transition">Transition Effect</label>
+                <select id="transition" name="transition">
+                    <option value="fade">Fade</option>
+                    <option value="slide">Slide</option>
+                    <option value="zoom">Zoom</option>
+                    <option value="none">None (Instant)</option>
+                </select>
+                <small>Animation between content items</small>
             </div>
             
             <div class="form-group">
