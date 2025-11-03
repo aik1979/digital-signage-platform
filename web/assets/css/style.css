@@ -666,10 +666,26 @@ a:hover {
 
 .content-stats .stat-item {
     background: white;
-    padding: 20px;
+    padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     text-align: center;
+}
+
+.content-stats .stat-icon {
+    font-size: 32px;
+}
+
+.content-stats .stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #3498DB;
+    margin: 5px 0;
+}
+
+.content-stats .stat-label {
+    color: #666;
+    font-size: 13px;
 }
 
 .content-controls {
@@ -771,7 +787,7 @@ a:hover {
     font-size: 64px;
 }
 
-.content-details {
+.content-card .content-details {
     padding: 15px;
 }
 
@@ -944,6 +960,12 @@ a:hover {
     margin: 20px 0;
 }
 
+@media (max-width: 1024px) {
+    .playlist-editor {
+        grid-template-columns: 1fr;
+    }
+}
+
 .editor-panel {
     background: white;
     padding: 20px;
@@ -990,8 +1012,13 @@ a:hover {
     object-fit: cover;
 }
 
-.content-details {
+.content-item .content-details,
+.playlist-item .content-details {
     flex: 1;
+}
+
+.content-card .content-details {
+    padding: 15px;
 }
 
 .btn-add,
