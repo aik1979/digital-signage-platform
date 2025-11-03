@@ -1,6 +1,46 @@
 <?php
 $userId = $auth->getUserId();
 
+// Handle GET requests for AJAX
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action'])) {
+    if ($_GET['action'] === 'get_share_link') {
+        $playlistId = intval($_GET['id'] ?? 0);
+        
+        // Verify ownership
+        $playlist = $db->fetchOne(
+            "SELECT id, name, share_token, share_enabled FROM playlists WHERE id = ? AND user_id = ?",
+            [$playlistId, $userId]
+        );
+        
+        if (!$playlist) {
+            jsonResponse(['success' => false, 'message' => 'Playlist not found']);
+        }
+        
+        if (!$playlist['share_enabled']) {
+            jsonResponse(['success' => false, 'message' => 'Sharing is not enabled for this playlist']);
+        }
+        
+        // Get short URL if exists
+        $shortUrl = $db->fetchOne(
+            "SELECT short_code FROM short_urls WHERE playlist_id = ? AND user_id = ? AND is_active = 1",
+            [$playlistId, $userId]
+        );
+        
+        if ($shortUrl) {
+            $url = rtrim(APP_URL, '/') . '/s/' . $shortUrl['short_code'];
+        } else {
+            // Fallback to share token URL
+            $url = rtrim(APP_URL, '/') . '/view/' . $playlist['share_token'];
+        }
+        
+        jsonResponse([
+            'success' => true,
+            'url' => $url,
+            'playlist_name' => $playlist['name']
+        ]);
+    }
+}
+
 // Handle playlist actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     
