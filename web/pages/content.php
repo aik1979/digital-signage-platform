@@ -7,23 +7,59 @@ $uploader = new ContentUploader($db, $userId);
 // Handle content actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     
-    // Upload content
+    // Upload content (supports multiple files)
     if ($_POST['action'] === 'upload_content') {
-        if (!isset($_FILES['content_file']) || $_FILES['content_file']['error'] !== UPLOAD_ERR_OK) {
-            setFlashMessage('error', 'Please select a file to upload.');
+        if (!isset($_FILES['content_file']) || empty($_FILES['content_file']['name'][0])) {
+            setFlashMessage('error', 'Please select at least one file to upload.');
         } else {
-            $title = sanitize($_POST['title'] ?? '');
             $duration = intval($_POST['duration'] ?? 10);
+            $uploadedCount = 0;
+            $failedCount = 0;
+            $errors = [];
             
-            $result = $uploader->upload($_FILES['content_file'], $title, $duration);
+            // Handle multiple files
+            $fileCount = count($_FILES['content_file']['name']);
             
-            if ($result['success']) {
-                logActivity($db, $userId, 'content_uploaded', 'content', $result['content_id'], 'Uploaded: ' . $result['filename']);
-                setFlashMessage('success', 'Content uploaded successfully!');
-                redirect('content');
-            } else {
-                setFlashMessage('error', $result['message']);
+            for ($i = 0; $i < $fileCount; $i++) {
+                // Skip if file has error
+                if ($_FILES['content_file']['error'][$i] !== UPLOAD_ERR_OK) {
+                    $failedCount++;
+                    continue;
+                }
+                
+                // Create single file array for uploader
+                $file = [
+                    'name' => $_FILES['content_file']['name'][$i],
+                    'type' => $_FILES['content_file']['type'][$i],
+                    'tmp_name' => $_FILES['content_file']['tmp_name'][$i],
+                    'error' => $_FILES['content_file']['error'][$i],
+                    'size' => $_FILES['content_file']['size'][$i]
+                ];
+                
+                // Use filename as title if not provided
+                $title = pathinfo($file['name'], PATHINFO_FILENAME);
+                
+                $result = $uploader->upload($file, $title, $duration);
+                
+                if ($result['success']) {
+                    logActivity($db, $userId, 'content_uploaded', 'content', $result['content_id'], 'Uploaded: ' . $result['filename']);
+                    $uploadedCount++;
+                } else {
+                    $failedCount++;
+                    $errors[] = $file['name'] . ': ' . $result['message'];
+                }
             }
+            
+            // Set appropriate message
+            if ($uploadedCount > 0 && $failedCount === 0) {
+                setFlashMessage('success', "Successfully uploaded {$uploadedCount} file(s)!");
+            } elseif ($uploadedCount > 0 && $failedCount > 0) {
+                setFlashMessage('warning', "Uploaded {$uploadedCount} file(s), {$failedCount} failed.");
+            } else {
+                setFlashMessage('error', 'All uploads failed: ' . implode(', ', $errors));
+            }
+            
+            redirect('content');
         }
     }
     
@@ -275,22 +311,17 @@ $totalSize = $db->fetchOne("SELECT SUM(file_size) as total FROM content WHERE us
             <input type="hidden" name="action" value="upload_content">
             
             <div class="form-group">
-                <label for="content_file">Select File *</label>
-                <input type="file" id="content_file" name="content_file" required 
+                <label for="content_file">Select Files *</label>
+                <input type="file" id="content_file" name="content_file[]" required multiple
                        accept="image/jpeg,image/png,video/mp4">
-                <small>Supported: JPG, PNG (max 10MB), MP4 (max 50MB)</small>
+                <small>Supported: JPG, PNG (max 10MB), MP4 (max 50MB). Select multiple files to upload at once.</small>
+                <div id="fileList" style="margin-top: 10px; font-size: 0.9em; color: #666;"></div>
             </div>
             
             <div class="form-group">
-                <label for="title">Title (Optional)</label>
-                <input type="text" id="title" name="title" 
-                       placeholder="Leave blank to use filename">
-            </div>
-            
-            <div class="form-group">
-                <label for="duration">Display Duration (seconds)</label>
+                <label for="duration">Default Display Duration (seconds)</label>
                 <input type="number" id="duration" name="duration" value="10" min="1" max="300">
-                <small>How long to display this content (images only)</small>
+                <small>Default duration for images (videos use their actual length)</small>
             </div>
             
             <div class="modal-footer">
@@ -423,6 +454,25 @@ function confirmDelete(contentId, contentTitle) {
         document.getElementById('deleteForm').submit();
     }
 }
+
+// Show selected files
+document.getElementById('content_file').addEventListener('change', function(e) {
+    const fileList = document.getElementById('fileList');
+    const files = e.target.files;
+    
+    if (files.length === 0) {
+        fileList.innerHTML = '';
+        return;
+    }
+    
+    let html = '<strong>Selected files (' + files.length + '):</strong><ul style="margin: 5px 0; padding-left: 20px;">';
+    for (let i = 0; i < files.length; i++) {
+        const size = (files[i].size / 1024 / 1024).toFixed(2);
+        html += '<li>' + files[i].name + ' (' + size + ' MB)</li>';
+    }
+    html += '</ul>';
+    fileList.innerHTML = html;
+});
 
 // Close modal when clicking outside
 window.onclick = function(event) {
