@@ -187,57 +187,90 @@ a:hover {
 
 /* Buttons */
 .btn {
-    display: inline-block;
-    padding: 10px 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 24px;
     border: none;
-    border-radius: 4px;
-    font-size: 16px;
+    border-radius: 6px;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     text-decoration: none;
-    transition: all 0.3s;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    font-size: 13px;
 }
 
 .btn-primary {
-    background-color: #3498DB;
+    background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
     color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .btn-primary:hover {
-    background-color: #2980B9;
-    text-decoration: none;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.4);
+    background: linear-gradient(135deg, #2980B9 0%, #21618C 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4), 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(52, 152, 219, 0.3);
 }
 
 .btn-secondary {
-    background-color: #666;
+    background: linear-gradient(135deg, #6C757D 0%, #5A6268 100%);
     color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .btn-secondary:hover {
-    background-color: #555;
-    text-decoration: none;
+    background: linear-gradient(135deg, #5A6268 0%, #4E555B 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3), 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(108, 117, 125, 0.2);
 }
 
 .btn-success {
-    background-color: #5CB85C;
+    background: linear-gradient(135deg, #5CB85C 0%, #4CAE4C 100%);
     color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .btn-success:hover {
-    background-color: #4CAE4C;
-    text-decoration: none;
+    background: linear-gradient(135deg, #4CAE4C 0%, #449D44 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(92, 184, 92, 0.4), 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-success:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(92, 184, 92, 0.3);
 }
 
 .btn-danger {
-    background-color: #E74C3C;
+    background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
     color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .btn-danger:hover {
-    background-color: #C0392B;
-    text-decoration: none;
+    background: linear-gradient(135deg, #C0392B 0%, #A93226 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4), 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-danger:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(231, 76, 60, 0.3);
 }
 
 .btn-block {
@@ -245,9 +278,10 @@ a:hover {
 }
 
 .btn.btn-sm {
-    padding: 8px 14px !important;
-    font-size: 13px !important;
-    font-weight: 500;
+    padding: 8px 16px !important;
+    font-size: 12px !important;
+    font-weight: 600;
+    border-radius: 5px;
 }
 
 /* Alerts */
