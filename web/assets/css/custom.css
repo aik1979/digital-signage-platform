@@ -1,0 +1,51 @@
+/**
+ * Digital Signage Platform - Custom Styles for Tailwind
+ * Only includes styles that can't be done with Tailwind utilities
+ */
+
+/* RGB Stripe Animation */
+@keyframes rgb-slide {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.rgb-stripe {
+    background: linear-gradient(90deg, #3498DB, #5CB85C, #E74C3C, #3498DB);
+    background-size: 200% 100%;
+    animation: rgb-slide 3s linear infinite;
+}
+
+/* SortableJS Drag Handle */
+.drag-handle {
+    cursor: move;
+    cursor: grab;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+/* Sortable Ghost (dragging state) */
+.sortable-ghost {
+    opacity: 0.4;
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
