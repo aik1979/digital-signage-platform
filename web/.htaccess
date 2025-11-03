@@ -41,16 +41,5 @@ AddDefaultCharset UTF-8
     Header set X-XSS-Protection "1; mode=block"
 </IfModule>
 
-# PHP settings
-<IfModule mod_php.c>
-    php_value upload_max_filesize 50M
-    php_value post_max_size 60M
-    php_value max_execution_time 300
-    php_value memory_limit 256M
-</IfModule>
-
-# PHP 8 settings (for FPM)
-php_value upload_max_filesize 50M
-php_value post_max_size 60M
-php_value max_execution_time 300
-php_value memory_limit 256M
+# PHP settings are configured in .user.ini file
+# (php_value directives don't work with PHP-FPM)
