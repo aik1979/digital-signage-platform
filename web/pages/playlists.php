@@ -421,13 +421,13 @@ if (isset($_GET['edit'])) {
         <div class="bg-gray-800 border border-gray-700 rounded-lg p-6">
             <h3 class="text-xl font-bold text-white mb-4">Playlist Items (<?php echo count($playlistItems); ?>)</h3>
             
+            <div id="playlistItems" class="space-y-2">
             <?php if (empty($playlistItems)): ?>
             <div class="text-center py-8 text-gray-400">
                 <p>No items in this playlist yet.</p>
-                <p class="text-sm mt-2">Drag content from the right to add items.</p>
+                <p class="text-sm mt-2">Click content from the right to add items.</p>
             </div>
             <?php else: ?>
-            <div id="playlistItems" class="space-y-2">
                 <?php foreach ($playlistItems as $item): ?>
                 <div class="bg-gray-700 border border-gray-600 rounded-lg p-3 flex items-center space-x-3 cursor-move hover:bg-gray-600 transition" data-id="<?php echo $item['content_id']; ?>">
                     <div class="text-gray-400">☰</div>
@@ -447,8 +447,8 @@ if (isset($_GET['edit'])) {
                     </button>
                 </div>
                 <?php endforeach; ?>
-            </div>
             <?php endif; ?>
+            </div>
         </div>
 
         <!-- Available Content -->
