@@ -429,7 +429,7 @@ if (isset($_GET['edit'])) {
             <?php else: ?>
             <div id="playlistItems" class="space-y-2">
                 <?php foreach ($playlistItems as $item): ?>
-                <div class="bg-gray-700 border border-gray-600 rounded-lg p-3 flex items-center space-x-3 cursor-move hover:bg-gray-600 transition" data-id="<?php echo $item['id']; ?>">
+                <div class="bg-gray-700 border border-gray-600 rounded-lg p-3 flex items-center space-x-3 cursor-move hover:bg-gray-600 transition" data-id="<?php echo $item['content_id']; ?>">
                     <div class="text-gray-400">☰</div>
                     <div class="w-12 h-12 bg-gray-900 rounded overflow-hidden flex-shrink-0">
                         <?php if ($item['file_type'] === 'image'): ?>
@@ -442,7 +442,7 @@ if (isset($_GET['edit'])) {
                         <p class="text-white font-medium truncate"><?php echo sanitize($item['title']); ?></p>
                         <p class="text-xs text-gray-400"><?php echo $item['duration']; ?>s • <?php echo ucfirst($item['file_type']); ?></p>
                     </div>
-                    <button type="button" class="text-red-400 hover:text-red-300" onclick="removeFromPlaylist(<?php echo $item['playlist_item_id']; ?>)">
+                    <button type="button" class="text-red-400 hover:text-red-300" onclick="removeFromPlaylist(<?php echo $item['id']; ?>)">
                         ✕
                     </button>
                 </div>
