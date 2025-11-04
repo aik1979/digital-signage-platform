@@ -182,6 +182,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
     }
     
+    // Remove item from playlist
+    if ($_POST['action'] === 'remove_from_playlist') {
+        $playlistItemId = intval($_POST['playlist_item_id'] ?? 0);
+        
+        // Get the playlist item to verify ownership
+        $item = $db->fetchOne(
+            "SELECT pi.id, pi.playlist_id FROM playlist_items pi 
+             INNER JOIN playlists p ON pi.playlist_id = p.id 
+             WHERE pi.id = ? AND p.user_id = ?",
+            [$playlistItemId, $userId]
+        );
+        
+        if (!$item) {
+            setFlashMessage('error', 'Playlist item not found.');
+            redirect('playlists');
+        }
+        
+        try {
+            $db->delete('playlist_items', 'id = :id', ['id' => $playlistItemId]);
+            logActivity($db, $userId, 'playlist_item_removed', 'playlist', $item['playlist_id'], 'Removed item from playlist');
+            setFlashMessage('success', 'Item removed from playlist!');
+            redirect('playlists', ['edit' => $item['playlist_id']]);
+        } catch (Exception $e) {
+            setFlashMessage('error', 'Failed to remove item.');
+            redirect('playlists');
+        }
+    }
+    
     // Delete playlist
     if ($_POST['action'] === 'delete_playlist') {
         $playlistId = intval($_POST['playlist_id'] ?? 0);
@@ -601,7 +629,7 @@ function addToPlaylist(contentId) {
     const playlistItemsEl = document.getElementById('playlistItems');
     const existingItems = Array.from(playlistItemsEl.querySelectorAll('[data-id]')).map(item => ({
         content_id: item.getAttribute('data-id'),
-        duration: item.querySelector('input[name="duration"]').value
+        duration: 10  // Default duration
     }));
 
     const newItems = [...existingItems, { content_id: contentId, duration: 10 }];
