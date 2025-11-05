@@ -85,6 +85,7 @@ include __DIR__ . '/includes/header.php';
         padding: 16px;
         border-radius: 4px;
         margin: 16px 0;
+        color: #000;
     }
     
     .info-box {
@@ -93,6 +94,7 @@ include __DIR__ . '/includes/header.php';
         padding: 16px;
         border-radius: 4px;
         margin: 16px 0;
+        color: #000;
     }
     
     .success-box {
@@ -101,6 +103,7 @@ include __DIR__ . '/includes/header.php';
         padding: 16px;
         border-radius: 4px;
         margin: 16px 0;
+        color: #000;
     }
 </style>
 

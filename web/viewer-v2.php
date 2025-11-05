@@ -147,8 +147,8 @@ $itemsJson = json_encode($items);
         }
         
         .content-item {
-            max-width: 100%;
-            max-height: 100%;
+            width: 100vw;
+            height: 100vh;
             object-fit: contain;
             position: absolute;
             opacity: 0;
@@ -294,14 +294,15 @@ $itemsJson = json_encode($items);
                 element = document.createElement('video');
                 element.src = item.file_path;
                 element.className = 'content-item active';
-                element.autoplay = true;
                 element.muted = true; // Must be muted for autoplay to work
                 element.playsInline = true; // Required for mobile
                 element.controls = false;
                 element.loop = false;
+                element.preload = 'auto';
                 
                 // Handle video end
                 element.addEventListener('ended', () => {
+                    console.log('Video ended, moving to next item');
                     nextItem();
                 });
                 
@@ -309,21 +310,24 @@ $itemsJson = json_encode($items);
                 element.addEventListener('error', (e) => {
                     console.error('Video error:', e);
                     console.error('Video source:', item.file_path);
+                    console.error('Error details:', element.error);
                     // Skip to next item on error
                     setTimeout(() => nextItem(), 1000);
                 });
                 
-                // Ensure video plays
-                element.addEventListener('loadeddata', () => {
-                    element.play().catch(err => {
-                        console.error('Play error:', err);
-                        // Try again with muted
-                        element.muted = true;
-                        element.play().catch(err2 => {
-                            console.error('Play error (muted):', err2);
+                // Handle when video can play
+                element.addEventListener('canplay', () => {
+                    console.log('Video can play, attempting to start...');
+                    const playPromise = element.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            console.log('Video playing successfully');
+                        }).catch(err => {
+                            console.error('Play error:', err);
+                            // If play fails, skip to next
                             setTimeout(() => nextItem(), 1000);
                         });
-                    });
+                    }
                 });
             }
             
