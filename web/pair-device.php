@@ -22,13 +22,22 @@ $success = '';
 $pairingInfo = null;
 
 // Check if user is logged in
-if (!$auth->isLoggedIn()) {
-    $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'];
-    header('Location: /index.php?page=login');
-    exit;
-}
+$isLoggedIn = $auth->isLoggedIn();
+$userId = $isLoggedIn ? $auth->getUserId() : null;
 
-$userId = $auth->getUserId();
+// Handle login from pairing page
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'login') {
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+    
+    if ($auth->login($email, $password)) {
+        $isLoggedIn = true;
+        $userId = $auth->getUserId();
+        // Don't redirect, just continue to show pairing form
+    } else {
+        $error = 'Invalid email or password.';
+    }
+}
 
 // Validate pairing code
 if ($pairingCode) {
@@ -129,17 +138,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-// Get user's playlists
-$playlists = $db->fetchAll(
-    "SELECT id, name, is_default FROM playlists WHERE user_id = ? AND is_active = 1 ORDER BY is_default DESC, name ASC",
-    [$userId]
-);
+// Get user's playlists and screens (only if logged in)
+$playlists = [];
+$existingScreens = [];
 
-// Get user's existing screens
-$existingScreens = $db->fetchAll(
-    "SELECT id, name, device_key FROM screens WHERE user_id = ? ORDER BY name ASC",
-    [$userId]
-);
+if ($isLoggedIn && $userId) {
+    $playlists = $db->fetchAll(
+        "SELECT id, name, is_default FROM playlists WHERE user_id = ? AND is_active = 1 ORDER BY is_default DESC, name ASC",
+        [$userId]
+    );
+    
+    $existingScreens = $db->fetchAll(
+        "SELECT id, name, device_key FROM screens WHERE user_id = ? ORDER BY name ASC",
+        [$userId]
+    );
+}
 
 ?>
 <!DOCTYPE html>
@@ -230,6 +243,54 @@ $existingScreens = $db->fetchAll(
                 <button type="submit" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-600 hover:to-purple-700 transition">
                     Continue
                 </button>
+            </form>
+            
+        <?php elseif (!$isLoggedIn): ?>
+            <!-- Login Required State -->
+            <div class="text-center mb-6">
+                <div class="text-5xl mb-4">🔐</div>
+                <h1 class="text-2xl font-bold text-gray-800 mb-2">Login Required</h1>
+                <p class="text-gray-600">Please login to pair this device</p>
+            </div>
+            
+            <?php if ($error): ?>
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+                    <?php echo htmlspecialchars($error); ?>
+                </div>
+            <?php endif; ?>
+            
+            <form method="POST" action="">
+                <input type="hidden" name="action" value="login">
+                <?php if ($pairingCode): ?>
+                    <input type="hidden" name="pairing_code" value="<?php echo htmlspecialchars($pairingCode); ?>">
+                <?php endif; ?>
+                
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-semibold mb-2">Email Address</label>
+                    <input type="email" 
+                           name="email" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                           placeholder="you@example.com"
+                           required
+                           autofocus>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-semibold mb-2">Password</label>
+                    <input type="password" 
+                           name="password" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                           placeholder="Enter your password"
+                           required>
+                </div>
+                
+                <button type="submit" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-600 hover:to-blue-700 transition mb-4">
+                    Login
+                </button>
+                
+                <div class="text-center text-sm text-gray-600">
+                    Don't have an account? <a href="/index.php?page=register" class="text-blue-600 hover:text-blue-700 font-semibold">Register here</a>
+                </div>
             </form>
             
         <?php else: ?>
