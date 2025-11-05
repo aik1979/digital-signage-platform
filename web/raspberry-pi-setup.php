@@ -1,14 +1,3 @@
-<?php
-session_start();
-require_once '../config/config.php';
-require_once '../includes/db.php';
-
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header('Location: /login.php');
-    exit;
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,8 +85,8 @@ if (!isset($_SESSION['user_id'])) {
                     <span class="font-bold text-xl">Digital Signage Platform</span>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="/dashboard.php" class="hover:text-blue-400 transition"><i class="fas fa-home mr-2"></i>Dashboard</a>
-                    <a href="/logout.php" class="hover:text-red-400 transition"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+                    <a href="/" class="hover:text-blue-400 transition"><i class="fas fa-home mr-2"></i>Home</a>
+                    <a href="/login.php" class="hover:text-green-400 transition"><i class="fas fa-sign-in-alt mr-2"></i>Login</a>
                 </div>
             </div>
         </div>
@@ -456,11 +445,11 @@ if (!isset($_SESSION['user_id'])) {
             </ul>
         </div>
 
-        <!-- Back to Dashboard -->
+        <!-- Back to Home -->
         <div class="text-center">
-            <a href="/dashboard.php" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-lg transition">
+            <a href="/" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-lg transition">
                 <i class="fas fa-arrow-left mr-2"></i>
-                Back to Dashboard
+                Back to Home
             </a>
         </div>
     </div>
