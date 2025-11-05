@@ -359,6 +359,9 @@ $totalSize = $db->fetchOne("SELECT SUM(file_size) as total FROM content WHERE us
                            accept="image/jpeg,image/png,video/mp4"
                            class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-dsp-blue file:text-white hover:file:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-dsp-blue focus:border-transparent transition">
                     <p class="text-xs text-gray-400 mt-1">Supported: JPG, PNG (max 10MB), MP4 (max 50MB). Select multiple files to upload at once.</p>
+                    <div class="mt-2 p-3 bg-blue-900 bg-opacity-30 border border-blue-700 rounded-lg">
+                        <p class="text-xs text-blue-300">🎬 <strong>Video Encoding:</strong> Videos are automatically encoded to Raspberry Pi compatible format (H.264 baseline) after upload. This may take a few moments depending on video size.</p>
+                    </div>
                     <div id="fileList" class="mt-2 text-sm text-gray-300"></div>
                 </div>
                 

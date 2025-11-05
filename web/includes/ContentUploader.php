@@ -62,8 +62,20 @@ class ContentUploader {
             }
         }
         
-        // Get video duration if video
+        // Encode video if video type (for Raspberry Pi compatibility)
         if ($fileType === 'video') {
+            require_once __DIR__ . '/VideoEncoder.php';
+            $encoder = new VideoEncoder();
+            
+            if ($encoder->isAvailable()) {
+                $encodeResult = $encoder->encodeInPlace($filePath);
+                if (!$encodeResult['success']) {
+                    // Log encoding failure but continue (video might still work)
+                    error_log('Video encoding failed: ' . $encodeResult['message']);
+                }
+            }
+            
+            // Get video duration
             $videoDuration = $this->getVideoDuration($filePath);
             if ($videoDuration > 0) {
                 $duration = $videoDuration;
