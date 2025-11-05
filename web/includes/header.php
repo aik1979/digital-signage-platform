@@ -7,10 +7,7 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="shortcut icon" href="favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Intro.js for guided tours -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
-    <link rel="stylesheet" href="assets/css/tour.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -53,7 +50,7 @@
                 
                 <!-- Desktop Right Menu -->
                 <div class="hidden lg:flex items-center space-x-4">
-                    <button onclick="startTour()" class="text-yellow-400 hover:text-yellow-300 text-sm transition-colors" title="Start Guided Tour">🎯 Tour</button>
+
                     <span class="text-gray-300 text-sm">Welcome, <?php echo sanitize($_SESSION['user_name']); ?></span>
                     <a href="?page=settings" class="text-gray-300 hover:text-white text-sm transition-colors">Settings</a>
                     <a href="?page=logout" class="text-gray-300 hover:text-white text-sm transition-colors">Logout</a>
@@ -81,7 +78,7 @@
                     <a href="?page=admin" class="px-4 py-2 rounded-md text-sm font-medium transition-colors <?php echo $page === 'admin' ? 'bg-purple-600 text-white' : 'text-purple-400 hover:bg-purple-900 hover:text-purple-300'; ?>">🛡️ Admin</a>
                     <?php endif; ?>
                     <hr class="border-gray-700 my-2">
-                    <button onclick="startTour()" class="px-4 py-2 text-left text-yellow-400 hover:text-yellow-300 text-sm transition-colors">🎯 Start Tour</button>
+
                     <a href="?page=settings" class="px-4 py-2 text-gray-300 hover:text-white text-sm transition-colors">Settings</a>
                     <a href="?page=logout" class="px-4 py-2 text-gray-300 hover:text-white text-sm transition-colors">Logout</a>
                 </div>

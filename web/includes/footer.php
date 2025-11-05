@@ -7,7 +7,7 @@
     </footer>
     
     <script src="assets/js/main.js"></script>
-    <script src="assets/js/tour.js"></script>
+
     <script>
     // Mobile menu toggle
     document.addEventListener('DOMContentLoaded', function() {

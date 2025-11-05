@@ -22,7 +22,6 @@ NC='\033[0m' # No Color
 # Configuration
 DSP_URL="${DSP_URL:-https://dsp.my-toolbox.info}"
 INSTALL_DIR="/opt/dsp-player"
-SERVICE_NAME="dsp-kiosk"
 
 echo -e "${BLUE}"
 echo "╔════════════════════════════════════════════════════════════╗"
@@ -74,76 +73,31 @@ cat > "$INSTALL_DIR/start-kiosk.sh" << 'EOFSCRIPT'
 #!/bin/bash
 # DSP Kiosk Startup Script
 
-# Load device ID
-DEVICE_ID=$(cat /opt/dsp-player/device_id)
-DSP_URL="https://dsp.my-toolbox.info"
+# Get device ID from RPi serial
+DEVICE_ID=$(cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2 | sed 's/^/dsp_/')
 
-# Wait for network
-echo "Waiting for network connection..."
-while ! ping -c 1 -W 1 google.com &> /dev/null; do
-    sleep 1
-done
-echo "Network connected!"
+# Always start with boot.php - it will check localStorage and redirect
+START_URL="https://dsp.my-toolbox.info/boot.php?device_id=${DEVICE_ID}"
 
 # Disable screen blanking and power management
 xset s off
-xset s noblank
 xset -dpms
+xset s noblank
 
 # Hide cursor
 unclutter -idle 0.1 -root &
 
-# Start window manager
-matchbox-window-manager -use_titlebar no &
-
-# Wait a moment for WM to start
-sleep 2
-
-# Check if already paired (using Chromium's localStorage)
-# On first boot, show pairing page
-# On subsequent boots, show splash screen with QR code for 10s, then load viewer
-
-# Create a simple HTML page that checks localStorage
-LOCAL_CHECK_FILE="/tmp/dsp-check-pairing.html"
-cat > "$LOCAL_CHECK_FILE" << 'HTMLEOF'
-<!DOCTYPE html>
-<html><head><script>
-const viewerUrl = localStorage.getItem('dsp_viewer_url');
-const deviceId = localStorage.getItem('dsp_device_id');
-if (viewerUrl && deviceId) {
-    // Already paired - redirect to splash screen
-    window.location.href = 'DSP_URL_PLACEHOLDER/splash.php?device_id=' + encodeURIComponent(deviceId) + '&viewer_url=' + encodeURIComponent(viewerUrl);
-} else {
-    // Not paired - show pairing page
-    window.location.href = 'DSP_URL_PLACEHOLDER/pair.php?device_id=DEVICE_ID_PLACEHOLDER';
-}
-</script></head><body>Loading...</body></html>
-HTMLEOF
-
-# Replace placeholders
-sed -i "s|DSP_URL_PLACEHOLDER|${DSP_URL}|g" "$LOCAL_CHECK_FILE"
-sed -i "s|DEVICE_ID_PLACEHOLDER|${DEVICE_ID}|g" "$LOCAL_CHECK_FILE"
-
-START_URL="file://$LOCAL_CHECK_FILE"
-
 # Launch Chromium in kiosk mode
 chromium-browser \
-    --kiosk \
-    --noerrdialogs \
-    --disable-infobars \
-    --disable-session-crashed-bubble \
-    --disable-component-update \
-    --check-for-update-interval=31536000 \
-    --disable-features=TranslateUI \
-    --no-first-run \
-    --fast \
-    --fast-start \
-    --disable-pinch \
-    --overscroll-history-navigation=0 \
-    --disable-notifications \
-    --disable-popup-blocking \
-    --start-fullscreen \
-    "$START_URL"
+  --kiosk \
+  --noerrdialogs \
+  --disable-infobars \
+  --no-first-run \
+  --check-for-update-interval=31536000 \
+  --disable-session-crashed-bubble \
+  --disable-features=TranslateUI \
+  --password-store=basic \
+  "${START_URL}"
 EOFSCRIPT
 
 chmod +x "$INSTALL_DIR/start-kiosk.sh"
@@ -169,11 +123,19 @@ fi
 EOF
 fi
 
-echo -e "${GREEN}[6/7]${NC} Creating systemd service..."
+echo -e "${GREEN}[6/7]${NC} Creating X startup configuration..."
 
-# Create .xinitrc to launch kiosk
-cat > ~/.xinitrc << EOF
+# Create .xinitrc to launch kiosk with matchbox window manager
+cat > ~/.xinitrc << 'EOF'
 #!/bin/bash
+xset s off
+xset -dpms
+xset s noblank
+
+# Start matchbox window manager (for kiosk mode)
+matchbox-window-manager -use_titlebar no &
+
+# Start the kiosk
 exec /opt/dsp-player/start-kiosk.sh
 EOF
 chmod +x ~/.xinitrc
@@ -196,15 +158,15 @@ echo -e "${BLUE}Device ID:${NC} $DEVICE_ID"
 echo ""
 echo -e "${YELLOW}Next steps:${NC}"
 echo "  1. Reboot your Raspberry Pi: ${BLUE}sudo reboot${NC}"
-echo "  2. The pairing page will appear automatically"
+echo "  2. The pairing page will appear automatically in fullscreen"
 echo "  3. Scan the QR code with your smartphone"
 echo "  4. Configure your screen in the web interface"
 echo "  5. Your display will start showing content!"
 echo ""
 echo -e "${BLUE}Useful commands:${NC}"
-echo "  • View logs: ${BLUE}journalctl --user -u $SERVICE_NAME -f${NC}"
-echo "  • Restart kiosk: ${BLUE}sudo systemctl restart $SERVICE_NAME${NC}"
-echo "  • Re-pair device: ${BLUE}rm /opt/dsp-player/viewer_url && sudo reboot${NC}"
+echo "  • Re-pair device: ${BLUE}rm -rf ~/.config/chromium/Default/Local\\ Storage/leveldb/ && sudo reboot${NC}"
+echo "  • Access terminal: ${BLUE}Press Ctrl+Alt+F2${NC}"
+echo "  • Return to kiosk: ${BLUE}Press Ctrl+Alt+F1${NC}"
 echo ""
 read -p "Reboot now? (Y/n) " -n 1 -r
 echo
