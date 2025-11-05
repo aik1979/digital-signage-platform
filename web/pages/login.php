@@ -16,6 +16,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if ($result['success']) {
             logActivity($db, $auth->getUserId(), 'login', 'user', $auth->getUserId(), 'User logged in');
+            
+            // Check if there's a redirect URL
+            if (isset($_SESSION['redirect_after_login'])) {
+                $redirectUrl = $_SESSION['redirect_after_login'];
+                unset($_SESSION['redirect_after_login']);
+                header('Location: ' . $redirectUrl);
+                exit;
+            }
+            
             redirect('dashboard');
         } else {
             $error = $result['message'];

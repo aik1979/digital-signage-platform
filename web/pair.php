@@ -74,7 +74,7 @@ $pairingUrl = rtrim(APP_URL, '/') . '/pair-device.php?code=' . $pairingCode;
         }
         
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             align-items: center;
@@ -93,7 +93,10 @@ $pairingUrl = rtrim(APP_URL, '/') . '/pair-device.php?code=' . $pairingCode;
             font-size: 48px;
             font-weight: bold;
             margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(90deg, #3498DB, #5CB85C, #E74C3C);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         h1 {
@@ -105,13 +108,14 @@ $pairingUrl = rtrim(APP_URL, '/') . '/pair-device.php?code=' . $pairingCode;
             font-size: 18px;
             opacity: 0.9;
             margin-bottom: 40px;
+            color: #aaa;
         }
         
         .qr-container {
             background: white;
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             margin-bottom: 30px;
             display: inline-block;
         }
@@ -121,18 +125,18 @@ $pairingUrl = rtrim(APP_URL, '/') . '/pair-device.php?code=' . $pairingCode;
         }
         
         .pairing-code {
-            background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
+            background: rgba(52, 152, 219, 0.1);
+            border: 2px solid #3498DB;
             padding: 20px 40px;
             border-radius: 15px;
             margin: 30px 0;
-            border: 2px solid rgba(255,255,255,0.3);
         }
         
         .code-label {
             font-size: 14px;
             opacity: 0.8;
             margin-bottom: 10px;
+            color: #aaa;
         }
         
         .code {
@@ -140,25 +144,28 @@ $pairingUrl = rtrim(APP_URL, '/') . '/pair-device.php?code=' . $pairingCode;
             font-weight: bold;
             letter-spacing: 8px;
             font-family: 'Courier New', monospace;
+            color: #3498DB;
         }
         
         .instructions {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.05);
             padding: 25px;
             border-radius: 15px;
             text-align: left;
             margin-top: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         
         .instructions h3 {
             margin-bottom: 15px;
             font-size: 20px;
+            color: #3498DB;
         }
         
         .instructions ol {
             margin-left: 20px;
             line-height: 1.8;
+            color: #ccc;
         }
         
         .instructions li {
@@ -168,7 +175,8 @@ $pairingUrl = rtrim(APP_URL, '/') . '/pair-device.php?code=' . $pairingCode;
         .status {
             margin-top: 30px;
             padding: 15px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(92, 184, 92, 0.1);
+            border: 1px solid #5CB85C;
             border-radius: 10px;
             font-size: 14px;
         }
@@ -185,7 +193,8 @@ $pairingUrl = rtrim(APP_URL, '/') . '/pair-device.php?code=' . $pairingCode;
         .device-info {
             margin-top: 20px;
             font-size: 12px;
-            opacity: 0.6;
+            opacity: 0.4;
+            color: #888;
         }
     </style>
 </head>
@@ -212,8 +221,8 @@ $pairingUrl = rtrim(APP_URL, '/') . '/pair-device.php?code=' . $pairingCode;
                 <li>Follow the setup wizard on your phone</li>
                 <li>This screen will automatically start displaying content</li>
             </ol>
-            <p style="margin-top: 15px; font-size: 14px; opacity: 0.8;">
-                <strong>Can't scan?</strong> Visit <strong><?php echo APP_URL; ?></strong> and enter code: <strong><?php echo $pairingCode; ?></strong>
+            <p style="margin-top: 15px; font-size: 14px; opacity: 0.8; color: #aaa;">
+                <strong>Can't scan?</strong> Visit <strong><?php echo APP_URL; ?></strong> and enter code: <strong style="color: #3498DB;"><?php echo $pairingCode; ?></strong>
             </p>
         </div>
         
@@ -250,7 +259,8 @@ $pairingUrl = rtrim(APP_URL, '/') . '/pair-device.php?code=' . $pairingCode;
                 if (data.paired) {
                     statusEl.innerHTML = '<div>✅ Paired successfully!</div><div style="font-size: 12px; margin-top: 5px;">Redirecting to viewer...</div>';
                     statusEl.classList.remove('checking');
-                    statusEl.style.background = 'rgba(76, 175, 80, 0.3)';
+                    statusEl.style.background = 'rgba(92, 184, 92, 0.2)';
+                    statusEl.style.borderColor = '#5CB85C';
                     
                     // Redirect to viewer
                     setTimeout(() => {
@@ -258,7 +268,8 @@ $pairingUrl = rtrim(APP_URL, '/') . '/pair-device.php?code=' . $pairingCode;
                     }, 2000);
                 } else if (data.expired) {
                     statusEl.innerHTML = '<div>⚠️ Pairing code expired</div><div style="font-size: 12px; margin-top: 5px;">Refreshing...</div>';
-                    statusEl.style.background = 'rgba(255, 152, 0, 0.3)';
+                    statusEl.style.background = 'rgba(231, 76, 60, 0.2)';
+                    statusEl.style.borderColor = '#E74C3C';
                     setTimeout(() => window.location.reload(), 3000);
                 }
             } catch (error) {
