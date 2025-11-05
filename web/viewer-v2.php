@@ -149,9 +149,16 @@ $itemsJson = json_encode($items);
         .content-item {
             width: 100vw;
             height: 100vh;
-            object-fit: contain;
+            object-fit: cover;
             position: absolute;
             opacity: 0;
+        }
+        
+        /* Portrait orientation support */
+        @media (orientation: portrait) {
+            .content-item {
+                object-fit: contain;
+            }
         }
         
         .content-item.active {
