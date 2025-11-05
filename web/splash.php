@@ -12,9 +12,11 @@ if (empty($deviceId) || empty($viewerUrl)) {
     die('Error: Missing device_id or viewer_url parameter');
 }
 
-// Generate pairing URL
-require_once __DIR__ . '/config/config.php';
-$pairingUrl = rtrim(APP_URL, '/') . '/pair.php?device_id=' . urlencode($deviceId);
+// Generate pairing URL (use current domain)
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$domain = $_SERVER['HTTP_HOST'] ?? 'dsp.my-toolbox.info';
+$baseUrl = $protocol . '://' . $domain;
+$pairingUrl = $baseUrl . '/pair.php?device_id=' . urlencode($deviceId);
 ?>
 <!DOCTYPE html>
 <html lang="en">
