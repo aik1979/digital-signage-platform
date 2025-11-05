@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
     
     // Handle form submissions that redirect
-    $redirectPages = ['screens', 'content', 'playlists', 'schedules', 'settings'];
+    $redirectPages = ['screens', 'content', 'playlists', 'schedules', 'settings', 'admin'];
     if (in_array($page, $redirectPages)) {
         require_once __DIR__ . '/pages/' . $page . '.php';
         // If we reach here, no redirect occurred, continue normally
