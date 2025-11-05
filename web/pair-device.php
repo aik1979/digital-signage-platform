@@ -45,11 +45,15 @@ if ($pairingCode) {
 
 // Handle pairing form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'pair_device') {
+    $pairingMode = $_POST['pairing_mode'] ?? 'new'; // 'new' or 'existing'
     $screenName = trim($_POST['screen_name'] ?? '');
+    $existingScreenId = intval($_POST['existing_screen_id'] ?? 0);
     $playlistId = intval($_POST['playlist_id'] ?? 0);
     $code = $_POST['pairing_code'] ?? '';
     
-    if (empty($screenName)) {
+    if ($pairingMode === 'existing' && $existingScreenId <= 0) {
+        $error = 'Please select an existing screen.';
+    } elseif ($pairingMode === 'new' && empty($screenName)) {
         $error = 'Please enter a screen name.';
     } elseif ($playlistId <= 0) {
         $error = 'Please select a playlist.';
@@ -69,30 +73,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             if (!$pairing) {
                 $error = 'Pairing session expired. Please try again.';
             } else {
-                // Generate device key
-                $deviceKey = bin2hex(random_bytes(16));
-                
-                // Create screen
-                $screenId = $db->insert('screens', [
-                    'user_id' => $userId,
-                    'name' => $screenName,
-                    'device_key' => $deviceKey,
-                    'current_playlist_id' => $playlistId,
-                    'is_active' => 1,
-                    'is_online' => 0
-                ]);
-                
-                // Update pairing status
-                $db->update('device_pairing', [
-                    'screen_id' => $screenId,
-                    'status' => 'paired',
-                    'paired_at' => date('Y-m-d H:i:s')
-                ], 'id = :id', ['id' => $pairing['id']]);
-                
-                // Pairing successful
-                
-                $success = true;
-                $viewerUrl = rtrim(APP_URL, '/') . '/viewer-v2.php?key=' . $deviceKey;
+                if ($pairingMode === 'existing') {
+                    // Verify screen belongs to user
+                    $screen = $db->fetchOne("SELECT id, device_key FROM screens WHERE id = ? AND user_id = ?", [$existingScreenId, $userId]);
+                    
+                    if (!$screen) {
+                        $error = 'Invalid screen selected.';
+                    } else {
+                        $screenId = $screen['id'];
+                        $deviceKey = $screen['device_key'];
+                        
+                        // Update screen's playlist
+                        $db->update('screens', [
+                            'current_playlist_id' => $playlistId
+                        ], 'id = :id', ['id' => $screenId]);
+                        
+                        // Update pairing status
+                        $db->update('device_pairing', [
+                            'screen_id' => $screenId,
+                            'status' => 'paired',
+                            'paired_at' => date('Y-m-d H:i:s')
+                        ], 'id = :id', ['id' => $pairing['id']]);
+                        
+                        $success = true;
+                        $viewerUrl = rtrim(APP_URL, '/') . '/viewer-v2.php?key=' . $deviceKey;
+                    }
+                } else {
+                    // Generate device key
+                    $deviceKey = bin2hex(random_bytes(16));
+                    
+                    // Create new screen
+                    $screenId = $db->insert('screens', [
+                        'user_id' => $userId,
+                        'name' => $screenName,
+                        'device_key' => $deviceKey,
+                        'current_playlist_id' => $playlistId,
+                        'is_active' => 1,
+                        'is_online' => 0
+                    ]);
+                    
+                    // Update pairing status
+                    $db->update('device_pairing', [
+                        'screen_id' => $screenId,
+                        'status' => 'paired',
+                        'paired_at' => date('Y-m-d H:i:s')
+                    ], 'id = :id', ['id' => $pairing['id']]);
+                    
+                    $success = true;
+                    $viewerUrl = rtrim(APP_URL, '/') . '/viewer-v2.php?key=' . $deviceKey;
+                }
             }
         }
     }
@@ -101,6 +130,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 // Get user's playlists
 $playlists = $db->fetchAll(
     "SELECT id, name, is_default FROM playlists WHERE user_id = ? AND is_active = 1 ORDER BY is_default DESC, name ASC",
+    [$userId]
+);
+
+// Get user's existing screens
+$existingScreens = $db->fetchAll(
+    "SELECT id, name, device_key FROM screens WHERE user_id = ? ORDER BY name ASC",
     [$userId]
 );
 
@@ -209,18 +244,56 @@ $playlists = $db->fetchAll(
                 </div>
             <?php endif; ?>
             
-            <form method="POST" action="">
+            <form method="POST" action="" id="pairingForm">
                 <input type="hidden" name="action" value="pair_device">
                 <input type="hidden" name="pairing_code" value="<?php echo htmlspecialchars($pairingCode); ?>">
+                <input type="hidden" name="pairing_mode" id="pairingMode" value="new">
                 
-                <div class="mb-4">
+                <!-- Toggle between new and existing screen -->
+                <?php if (count($existingScreens) > 0): ?>
+                <div class="mb-6">
+                    <div class="flex gap-2 bg-gray-100 p-1 rounded-lg">
+                        <button type="button" 
+                                onclick="toggleMode('new')" 
+                                id="newBtn"
+                                class="flex-1 py-2 px-4 rounded-md font-semibold transition bg-white shadow text-gray-800">
+                            Create New Screen
+                        </button>
+                        <button type="button" 
+                                onclick="toggleMode('existing')" 
+                                id="existingBtn"
+                                class="flex-1 py-2 px-4 rounded-md font-semibold transition text-gray-600">
+                            Use Existing Screen
+                        </button>
+                    </div>
+                </div>
+                <?php endif; ?>
+                
+                <!-- New Screen Form -->
+                <div id="newScreenForm" class="mb-4">
                     <label class="block text-gray-700 font-semibold mb-2">Screen Name</label>
                     <input type="text" 
                            name="screen_name" 
+                           id="screenNameInput"
                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
-                           placeholder="e.g., Lobby Display, Kitchen Screen"
-                           required>
+                           placeholder="e.g., Lobby Display, Kitchen Screen">
                     <p class="text-sm text-gray-500 mt-1">Give this screen a memorable name</p>
+                </div>
+                
+                <!-- Existing Screen Form -->
+                <div id="existingScreenForm" class="mb-4 hidden">
+                    <label class="block text-gray-700 font-semibold mb-2">Select Existing Screen</label>
+                    <select name="existing_screen_id" 
+                            id="existingScreenSelect"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <option value="">Choose a screen...</option>
+                        <?php foreach ($existingScreens as $screen): ?>
+                            <option value="<?php echo $screen['id']; ?>">
+                                <?php echo htmlspecialchars($screen['name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <p class="text-sm text-gray-500 mt-1">This will update the selected screen's device key</p>
                 </div>
                 
                 <div class="mb-6">
@@ -249,5 +322,45 @@ $playlists = $db->fetchAll(
             <a href="/index.php?page=dashboard" class="text-sm text-gray-400 hover:text-dsp-blue transition">← Back to Dashboard</a>
         </div>
     </div>
+    
+    <script>
+        function toggleMode(mode) {
+            const pairingMode = document.getElementById('pairingMode');
+            const newBtn = document.getElementById('newBtn');
+            const existingBtn = document.getElementById('existingBtn');
+            const newForm = document.getElementById('newScreenForm');
+            const existingForm = document.getElementById('existingScreenForm');
+            const screenNameInput = document.getElementById('screenNameInput');
+            const existingScreenSelect = document.getElementById('existingScreenSelect');
+            
+            pairingMode.value = mode;
+            
+            if (mode === 'new') {
+                // Style buttons
+                newBtn.className = 'flex-1 py-2 px-4 rounded-md font-semibold transition bg-white shadow text-gray-800';
+                existingBtn.className = 'flex-1 py-2 px-4 rounded-md font-semibold transition text-gray-600';
+                
+                // Show/hide forms
+                newForm.classList.remove('hidden');
+                existingForm.classList.add('hidden');
+                
+                // Update required fields
+                screenNameInput.required = true;
+                existingScreenSelect.required = false;
+            } else {
+                // Style buttons
+                newBtn.className = 'flex-1 py-2 px-4 rounded-md font-semibold transition text-gray-600';
+                existingBtn.className = 'flex-1 py-2 px-4 rounded-md font-semibold transition bg-white shadow text-gray-800';
+                
+                // Show/hide forms
+                newForm.classList.add('hidden');
+                existingForm.classList.remove('hidden');
+                
+                // Update required fields
+                screenNameInput.required = false;
+                existingScreenSelect.required = true;
+            }
+        }
+    </script>
 </body>
 </html>
