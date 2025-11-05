@@ -91,7 +91,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                         // Update pairing status
                         $db->update('device_pairing', [
                             'screen_id' => $screenId,
-                            'status' => 'paired',
+                            'user_id' => $userId,
+                            'status' => 'completed',
                             'paired_at' => date('Y-m-d H:i:s')
                         ], 'id = :id', ['id' => $pairing['id']]);
                         
@@ -115,7 +116,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     // Update pairing status
                     $db->update('device_pairing', [
                         'screen_id' => $screenId,
-                        'status' => 'paired',
+                        'user_id' => $userId,
+                        'status' => 'completed',
                         'paired_at' => date('Y-m-d H:i:s')
                     ], 'id = :id', ['id' => $pairing['id']]);
                     
