@@ -299,6 +299,36 @@ $itemsJson = json_encode($items);
                 element.controls = false;
                 element.loop = false;
                 element.preload = 'auto';
+                element.setAttribute('webkit-playsinline', 'true'); // iOS compatibility
+                
+                // Track if video is playing
+                let isPlaying = false;
+                let playAttempts = 0;
+                const maxAttempts = 5;
+                
+                // Function to attempt playing video
+                const attemptPlay = () => {
+                    if (isPlaying || playAttempts >= maxAttempts) return;
+                    
+                    playAttempts++;
+                    console.log(`Play attempt ${playAttempts} for video:`, item.file_path);
+                    
+                    const playPromise = element.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            console.log('Video playing successfully');
+                            isPlaying = true;
+                        }).catch(err => {
+                            console.error(`Play attempt ${playAttempts} failed:`, err);
+                            if (playAttempts < maxAttempts) {
+                                setTimeout(attemptPlay, 500);
+                            } else {
+                                console.error('All play attempts failed, skipping video');
+                                setTimeout(() => nextItem(), 1000);
+                            }
+                        });
+                    }
+                };
                 
                 // Handle video end
                 element.addEventListener('ended', () => {
@@ -315,18 +345,36 @@ $itemsJson = json_encode($items);
                     setTimeout(() => nextItem(), 1000);
                 });
                 
-                // Handle when video can play
+                // Try to play as soon as metadata is loaded
+                element.addEventListener('loadedmetadata', () => {
+                    console.log('Video metadata loaded, duration:', element.duration);
+                    attemptPlay();
+                });
+                
+                // Also try when can play
                 element.addEventListener('canplay', () => {
-                    console.log('Video can play, attempting to start...');
-                    const playPromise = element.play();
-                    if (playPromise !== undefined) {
-                        playPromise.then(() => {
-                            console.log('Video playing successfully');
-                        }).catch(err => {
-                            console.error('Play error:', err);
-                            // If play fails, skip to next
-                            setTimeout(() => nextItem(), 1000);
-                        });
+                    console.log('Video can play');
+                    attemptPlay();
+                });
+                
+                // And when can play through
+                element.addEventListener('canplaythrough', () => {
+                    console.log('Video can play through');
+                    attemptPlay();
+                });
+                
+                // Monitor playing state
+                element.addEventListener('playing', () => {
+                    console.log('Video is now playing');
+                    isPlaying = true;
+                });
+                
+                element.addEventListener('pause', () => {
+                    console.log('Video paused');
+                    if (isPlaying) {
+                        // Video was playing but paused, try to resume
+                        console.log('Attempting to resume...');
+                        attemptPlay();
                     }
                 });
             }
