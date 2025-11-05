@@ -162,8 +162,11 @@
                 <p class="text-sm text-gray-300">Create multiple screens for different locations, each with its own playlist.</p>
             </div>
             <div class="bg-black bg-opacity-30 rounded-lg p-4">
-                <h4 class="font-bold mb-2">🍓 Raspberry Pi</h4>
-                <p class="text-sm text-gray-300">Coming soon: Dedicated Raspberry Pi player for dedicated digital signage hardware.</p>
+                <h4 class="font-bold mb-2">🍓 Raspberry Pi Setup</h4>
+                <p class="text-sm text-gray-300">Set up a dedicated Raspberry Pi display with our one-line installer.</p>
+                <a href="/raspberry-pi-setup.php" class="inline-block mt-2 text-blue-400 hover:text-blue-300 text-sm font-semibold">
+                    View Setup Guide →
+                </a>
             </div>
         </div>
     </div>
