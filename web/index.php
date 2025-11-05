@@ -109,6 +109,9 @@ switch ($page) {
     case 'admin':
         include __DIR__ . '/pages/admin.php';
         break;
+    case 'admin-debug':
+        include __DIR__ . '/pages/admin-debug.php';
+        break;
     case 'home':
     default:
         if ($isLoggedIn) {
