@@ -295,11 +295,35 @@ $itemsJson = json_encode($items);
                 element.src = item.file_path;
                 element.className = 'content-item active';
                 element.autoplay = true;
-                element.muted = false;
+                element.muted = true; // Must be muted for autoplay to work
+                element.playsInline = true; // Required for mobile
                 element.controls = false;
+                element.loop = false;
                 
+                // Handle video end
                 element.addEventListener('ended', () => {
                     nextItem();
+                });
+                
+                // Handle video errors
+                element.addEventListener('error', (e) => {
+                    console.error('Video error:', e);
+                    console.error('Video source:', item.file_path);
+                    // Skip to next item on error
+                    setTimeout(() => nextItem(), 1000);
+                });
+                
+                // Ensure video plays
+                element.addEventListener('loadeddata', () => {
+                    element.play().catch(err => {
+                        console.error('Play error:', err);
+                        // Try again with muted
+                        element.muted = true;
+                        element.play().catch(err2 => {
+                            console.error('Play error (muted):', err2);
+                            setTimeout(() => nextItem(), 1000);
+                        });
+                    });
                 });
             }
             
