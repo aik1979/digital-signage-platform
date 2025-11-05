@@ -15,6 +15,9 @@ $db = Database::getInstance();
 // Get device key from URL
 $deviceKey = isset($_GET['key']) ? trim($_GET['key']) : '';
 
+// Check if info overlay should be shown (default: hidden)
+$showInfo = isset($_GET['info']) && $_GET['info'] === '1';
+
 if (empty($deviceKey)) {
     die('Error: No device key provided. Use: viewer-v2.php?key=YOUR_DEVICE_KEY');
 }
@@ -246,7 +249,7 @@ $itemsJson = json_encode($items);
         <div class="loading">Loading content...</div>
     </div>
     
-    <div id="info">
+    <div id="info" class="<?php echo $showInfo ? '' : 'hidden'; ?>">
         <div><strong><?php echo htmlspecialchars($screen['name']); ?></strong></div>
         <div id="currentItem">Item 1 of <?php echo count($items); ?></div>
         <div id="timer">--</div>
@@ -426,11 +429,13 @@ $itemsJson = json_encode($items);
         // Initial update check after 5 seconds
         setTimeout(checkForUpdates, 5000);
         
-        // Full page reload every 5 minutes (cache clearing)
-        setInterval(() => {
-            console.log('Performing periodic full reload...');
-            window.location.reload();
-        }, 300000); // 5 minutes
+        // Full page reload every 5 minutes (cache clearing) - only if multiple items
+        if (items.length > 1) {
+            setInterval(() => {
+                console.log('Performing periodic full reload...');
+                window.location.reload();
+            }, 300000); // 5 minutes
+        }
     </script>
 </body>
 </html>
