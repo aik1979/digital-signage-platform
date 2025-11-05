@@ -24,7 +24,7 @@ $pairingInfo = null;
 // Check if user is logged in
 if (!$auth->isLoggedIn()) {
     $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'];
-    header('Location: ?page=login');
+    header('Location: /index.php?page=login');
     exit;
 }
 
@@ -139,7 +139,7 @@ $playlists = $db->fetchAll(
                     <p class="text-xs font-mono bg-white p-2 rounded mt-2 break-all"><?php echo $viewerUrl; ?></p>
                 </div>
                 
-                <a href="?page=screens" class="inline-block bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-600 hover:to-purple-700 transition">
+                <a href="/index.php?page=screens" class="inline-block bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-600 hover:to-purple-700 transition">
                     Go to Screens
                 </a>
             </div>
@@ -236,7 +236,7 @@ $playlists = $db->fetchAll(
         <?php endif; ?>
         
         <div class="mt-6 text-center">
-            <a href="?page=dashboard" class="text-sm text-gray-500 hover:text-gray-700">← Back to Dashboard</a>
+            <a href="/index.php?page=dashboard" class="text-sm text-gray-500 hover:text-gray-700">← Back to Dashboard</a>
         </div>
     </div>
 </body>
