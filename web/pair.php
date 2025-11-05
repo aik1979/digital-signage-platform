@@ -262,6 +262,10 @@ $pairingUrl = rtrim(APP_URL, '/') . '/pair-device.php?code=' . $pairingCode;
                     statusEl.style.background = 'rgba(92, 184, 92, 0.2)';
                     statusEl.style.borderColor = '#5CB85C';
                     
+                    // Save viewer URL to localStorage for future boots
+                    localStorage.setItem('dsp_viewer_url', data.viewer_url);
+                    localStorage.setItem('dsp_device_id', deviceId);
+                    
                     // Redirect to viewer
                     setTimeout(() => {
                         window.location.href = data.viewer_url;

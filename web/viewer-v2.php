@@ -332,8 +332,11 @@ $itemsJson = json_encode($items);
         }
         
         function nextItem() {
-            currentIndex = (currentIndex + 1) % items.length;
-            showItem(currentIndex);
+            // Don't advance if only 1 item - just stay on it
+            if (items.length > 1) {
+                currentIndex = (currentIndex + 1) % items.length;
+                showItem(currentIndex);
+            }
         }
         
         function logPlayback(contentId) {

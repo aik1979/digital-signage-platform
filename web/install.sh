@@ -99,19 +99,32 @@ matchbox-window-manager -use_titlebar no &
 # Wait a moment for WM to start
 sleep 2
 
-# Check if already paired
-PAIRED_URL_FILE="/opt/dsp-player/viewer_url"
+# Check if already paired (using Chromium's localStorage)
+# On first boot, show pairing page
+# On subsequent boots, show splash screen with QR code for 10s, then load viewer
 
-if [ -f "$PAIRED_URL_FILE" ]; then
-    # Already paired, load viewer URL
-    VIEWER_URL=$(cat "$PAIRED_URL_FILE")
-    echo "Device already paired, loading viewer: $VIEWER_URL"
-    START_URL="$VIEWER_URL"
-else
-    # Not paired yet, show pairing page
-    echo "Device not paired, showing pairing page..."
-    START_URL="${DSP_URL}/pair.php?device_id=${DEVICE_ID}"
-fi
+# Create a simple HTML page that checks localStorage
+LOCAL_CHECK_FILE="/tmp/dsp-check-pairing.html"
+cat > "$LOCAL_CHECK_FILE" << 'HTMLEOF'
+<!DOCTYPE html>
+<html><head><script>
+const viewerUrl = localStorage.getItem('dsp_viewer_url');
+const deviceId = localStorage.getItem('dsp_device_id');
+if (viewerUrl && deviceId) {
+    // Already paired - redirect to splash screen
+    window.location.href = 'DSP_URL_PLACEHOLDER/splash.php?device_id=' + encodeURIComponent(deviceId) + '&viewer_url=' + encodeURIComponent(viewerUrl);
+} else {
+    // Not paired - show pairing page
+    window.location.href = 'DSP_URL_PLACEHOLDER/pair.php?device_id=DEVICE_ID_PLACEHOLDER';
+}
+</script></head><body>Loading...</body></html>
+HTMLEOF
+
+# Replace placeholders
+sed -i "s|DSP_URL_PLACEHOLDER|${DSP_URL}|g" "$LOCAL_CHECK_FILE"
+sed -i "s|DEVICE_ID_PLACEHOLDER|${DEVICE_ID}|g" "$LOCAL_CHECK_FILE"
+
+START_URL="file://$LOCAL_CHECK_FILE"
 
 # Launch Chromium in kiosk mode
 chromium-browser \
