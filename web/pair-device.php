@@ -45,7 +45,7 @@ if ($pairingCode) {
 
 // Handle pairing form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'pair_device') {
-    $screenName = sanitize($_POST['screen_name'] ?? '');
+    $screenName = trim($_POST['screen_name'] ?? '');
     $playlistId = intval($_POST['playlist_id'] ?? 0);
     $code = $_POST['pairing_code'] ?? '';
     
@@ -77,8 +77,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     'user_id' => $userId,
                     'name' => $screenName,
                     'device_key' => $deviceKey,
-                    'device_id' => $pairing['device_id'],
-                    'pairing_code' => $code,
                     'current_playlist_id' => $playlistId,
                     'is_active' => 1,
                     'is_online' => 0
@@ -91,8 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     'paired_at' => date('Y-m-d H:i:s')
                 ], 'id = :id', ['id' => $pairing['id']]);
                 
-                // Log activity
-                logActivity($db, $userId, 'screen_paired', 'screen', $screenId, "Paired device: $screenName");
+                // Pairing successful
                 
                 $success = true;
                 $viewerUrl = rtrim(APP_URL, '/') . '/viewer-v2.php?key=' . $deviceKey;
