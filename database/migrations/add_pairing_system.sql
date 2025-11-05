@@ -11,15 +11,18 @@ CREATE TABLE IF NOT EXISTS device_pairing (
     expires_at DATETIME NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     paired_at DATETIME DEFAULT NULL,
-    FOREIGN KEY (screen_id) REFERENCES screens(id) ON DELETE CASCADE,
     INDEX idx_pairing_code (pairing_code),
     INDEX idx_device_id (device_id),
-    INDEX idx_status (status)
+    INDEX idx_status (status),
+    INDEX idx_screen_id (screen_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Add pairing-related columns to screens table if not exists
+-- Add pairing-related columns to screens table
 ALTER TABLE screens 
-ADD COLUMN IF NOT EXISTS pairing_code VARCHAR(10) DEFAULT NULL,
-ADD COLUMN IF NOT EXISTS device_id VARCHAR(100) DEFAULT NULL,
-ADD INDEX IF NOT EXISTS idx_pairing_code (pairing_code),
-ADD INDEX IF NOT EXISTS idx_device_id (device_id);
+ADD COLUMN pairing_code VARCHAR(10) DEFAULT NULL,
+ADD COLUMN device_id VARCHAR(100) DEFAULT NULL;
+
+-- Add indexes for pairing columns
+ALTER TABLE screens
+ADD INDEX idx_pairing_code (pairing_code),
+ADD INDEX idx_device_id (device_id);
